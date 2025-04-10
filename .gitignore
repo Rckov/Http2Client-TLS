@@ -361,3 +361,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/src/TlsClient.Core/runtimes/win-x64/native/tls-client-latest.dll
