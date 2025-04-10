@@ -1,11 +1,17 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using TlsClient.Core.Helpers;
-using TlsClient.Core.Models;
+using TlsClient.Core.Helpers.Natives;
+using TlsClient.Core.Helpers.Wrappers;
+using TlsClient.Core.Models.Entities;
+using TlsClient.Core.Models.Requests;
+using TlsClient.Core.Models.Responses;
 
 
 namespace TlsClient.Core
@@ -14,31 +20,37 @@ namespace TlsClient.Core
     {
         private IntPtr LoadedLibrary { get; set; } = IntPtr.Zero;
         private TlsClientOptions Options { get; set; }
+        public Dictionary<string, List<string>> DefaultHeaders => Options.DefaultHeaders;
         public TlsClient(TlsClientOptions options)
         {
-            Options = options ?? throw new Exception("Options is null");
+            Options = options ?? throw new ArgumentNullException(nameof(options));
             LoadedLibrary = NativeLoader.LoadNativeAssembly();
         }
 
         public TlsClient() : this(new TlsClientOptions(TlsClientIdentifier.Chrome132, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 OPR/117.0.0.0")) { }
-        public async Task<TlsClientResponse> RequestAsync(TlsClientRequest request)
+        public async Task<Response> RequestAsync(Request request, CancellationToken cancellationToken = default)
         {
-            request.SessionId = request.SessionId ?? Options.SessionID;
-            request.TlsClientIdentifier = request.TlsClientIdentifier ?? Options.TlsClientIdentifier;
-            request.TimeoutMilliseconds = request.TimeoutMilliseconds ?? (int)Options.Timeout.TotalMilliseconds;
-            request.ProxyUrl = request.ProxyUrl ?? Options.ProxyURL;
-            request.IsRotatingProxy = request.IsRotatingProxy ?? Options.IsRotatingProxy;
-            request.FollowRedirects = request.FollowRedirects ?? Options.FollowRedirects;
-            request.InsecureSkipVerify = request.InsecureSkipVerify ?? Options.InsecureSkipVerify;
-            request.DisableIPV4 = request.DisableIPV4 ?? Options.DisableIPV4;
-            request.DisableIPV6 = request.DisableIPV6 ?? Options.DisableIPV6;
-            request.WithDebug = request.WithDebug ?? Options.WithDebug;
-            request.WithDefaultCookieJar = request.WithDefaultCookieJar ?? Options.WithDefaultCookieJar;
-            request.WithoutCookieJar = request.WithoutCookieJar ?? Options.WithoutCookieJar;
-            // Default headers prop is not working
-            request.DefaultHeaders = request.DefaultHeaders ?? Options.DefaultHeaders;
-            request.RequestUrl = request.RequestUrl ?? throw new ArgumentNullException(nameof(request.RequestUrl));
-            request.Headers = request.Headers ?? new Dictionary<string, string>();
+            if (request.RequestUrl == null)
+            {
+                throw new ArgumentNullException(nameof(request.RequestUrl));
+            }
+
+            request.SessionId ??= Options.SessionID;
+            request.TlsClientIdentifier ??= Options.TlsClientIdentifier;
+            request.TimeoutMilliseconds ??= (int)Options.Timeout.TotalMilliseconds;
+            request.ProxyUrl ??= Options.ProxyURL;
+            request.IsRotatingProxy ??= Options.IsRotatingProxy;
+            request.FollowRedirects ??= Options.FollowRedirects;
+            request.InsecureSkipVerify ??= Options.InsecureSkipVerify;
+            request.DisableIPV4 ??= Options.DisableIPV4;
+            request.DisableIPV6 ??= Options.DisableIPV6;
+            request.WithDebug ??= Options.WithDebug;
+            request.WithDefaultCookieJar ??= Options.WithDefaultCookieJar;
+            request.WithoutCookieJar ??= Options.WithoutCookieJar;
+
+            // DefaultHeaders prop is not working
+            request.DefaultHeaders ??= Options.DefaultHeaders;
+            request.Headers ??= new Dictionary<string, string>();
 
             // Default headers prop is not working
             foreach (var header in request.DefaultHeaders)
@@ -49,26 +61,74 @@ namespace TlsClient.Core
                 }
             }
 
-            var rawResponse= await TlsClientAsyncWrapper.RequestAsync(RequestHelpers.Prepare(request));
-            var response = JsonConvert.DeserializeObject<TlsClientResponse>(rawResponse);
-            if (response == null)
-            {
-                throw new Exception("Response is null, can't convert object from json.");
-            }
+            var rawResponse= await TlsClientAsyncWrapper.RequestAsync(RequestHelpers.Prepare(request), cancellationToken);
+            var response = JsonConvert.DeserializeObject<Response>(rawResponse) ?? throw new Exception("Response is null, can't convert object from json.");
+            
             // Need to free memory, because the native library allocates memory for the response
             await TlsClientAsyncWrapper.FreeMemoryAsync(response.Id);
             return response;
         }
 
-        public void Dispose()
+        public async Task<GetCookiesFromSessionResponse> GetCookiesAsync(string url, CancellationToken cancellationToken = default)
         {
-            if(LoadedLibrary == IntPtr.Zero)
+            if (string.IsNullOrEmpty(url))
             {
-                return;
+                throw new ArgumentNullException(nameof(url));
             }
 
+            var payload = new GetCookiesFromSessionRequest()
+            {
+                SessionID = Options.SessionID,
+                Url = url,
+            };
+
+            var rawResponse = await TlsClientAsyncWrapper.GetCookiesFromSessionAsync(RequestHelpers.Prepare(payload), cancellationToken);
+            return JsonConvert.DeserializeObject<GetCookiesFromSessionResponse>(rawResponse) ?? throw new Exception("Response is null, can't convert object from json.");
+        }
+
+        public async Task<DestroyResponse> DestroyAsync(CancellationToken cancellationToken = default)
+        {
+            var payload = new DestroyRequest()
+            {
+                SessionID = Options.SessionID,
+            };
+
+            var rawResponse = await TlsClientAsyncWrapper.DestroySessionAsync(RequestHelpers.Prepare(payload), cancellationToken);
+            return JsonConvert.DeserializeObject<DestroyResponse>(rawResponse) ?? throw new Exception("Response is null, can't convert object from json.");
+        }
+
+        public async Task<DestroyResponse> DestroyAllAsync(CancellationToken cancellationToken = default)
+        {
+            var rawResponse = await TlsClientAsyncWrapper.DestroyAll(cancellationToken);
+            return JsonConvert.DeserializeObject<DestroyResponse>(rawResponse) ?? throw new Exception("Response is null, can't convert object from json.");
+        }
+
+        public async Task<GetCookiesFromSessionResponse> AddCookiesAsync(string url, List<TlsClientCookie> cookies, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                throw new ArgumentNullException(nameof(url));
+            }
+
+            var payload = new AddCookiesToSessionRequest()
+            {
+                SessionID = Options.SessionID,
+                Url = url,
+                Cookies = cookies,
+            };
+            var rawResponse = await TlsClientAsyncWrapper.AddCookiesToSessionAsync(RequestHelpers.Prepare(payload), cancellationToken);
+            return JsonConvert.DeserializeObject<GetCookiesFromSessionResponse>(rawResponse) ?? throw new Exception("Response is null, can't convert object from json.");
+        }
+  
+
+        public void Dispose()
+        {
+            if(LoadedLibrary == IntPtr.Zero) return;
+
             NativeLoader.FreeNativeAssembly(LoadedLibrary);
+            DestroyAsync().GetAwaiter().GetResult();
             LoadedLibrary = IntPtr.Zero;
+
             GC.SuppressFinalize(this);
         }
     }

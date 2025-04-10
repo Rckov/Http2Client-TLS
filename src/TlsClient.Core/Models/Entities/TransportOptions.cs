@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TlsClient.Core.Models
+namespace TlsClient.Core.Models.Entities
 {
     public class TransportOptions
     {

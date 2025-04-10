@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
 
 
-namespace TlsClient.Core.Models
+namespace TlsClient.Core.Models.Entities
 {
     // Reference: https://github.com/bogdanfinn/tls-client/blob/master/profiles/profiles.go
-    [JsonConverter(typeof(TlsClientIdentifierJsonConverter))]
     public sealed class TlsClientIdentifier
     {
         #region Chrome Profiles

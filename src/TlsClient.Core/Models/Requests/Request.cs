@@ -1,13 +1,17 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 
-namespace TlsClient.Core.Models
+using TlsClient.Core.Helpers.Converters;
+using TlsClient.Core.Models.Entities;
+
+namespace TlsClient.Core.Models.Requests
 {
-    // TODO: Eksikler eklenecek
     // Reference: https://github.com/bogdanfinn/tls-client/blob/master/cffi_src/types.go#L51
-    public class TlsClientRequest
+    public class Request
     {
         public Dictionary<string, List<string>> CertificatePinningHosts { get; set; }
         public CustomTlsClient? CustomTlsClient { get; set; }
@@ -24,11 +28,13 @@ namespace TlsClient.Core.Models
         public int? StreamOutputBlockSize { get; set; }
         public string? StreamOutputEOFSymbol { get; set; }
         public string? StreamOutputPath { get; set; }
-        public TlsClientMethod RequestMethod { get; set; } = default;
+        [JsonConverter(typeof(JsonStringConverter<HttpMethod>))]
+        public HttpMethod RequestMethod { get; set; } = HttpMethod.Get;
         public string RequestUrl { get; set; } = string.Empty;
+        [JsonConverter(typeof(JsonStringConverter<TlsClientIdentifier>))]
         public TlsClientIdentifier TlsClientIdentifier { get; set; } = TlsClientIdentifier.Chrome131;
         public List<string> HeaderOrder { get; set; } = new List<string>();
-        public List<Cookie> RequestCookies { get; set; } = new List<Cookie>();
+        public List<TlsClientCookie> RequestCookies { get; set; } = new List<TlsClientCookie>();
         public int? TimeoutMilliseconds { get; set; }
         public int TimeoutSeconds { get; set; }
         public bool CatchPanics { get; set; }

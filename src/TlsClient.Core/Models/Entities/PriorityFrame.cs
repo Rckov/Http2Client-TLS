@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TlsClient.Core.Models
+namespace TlsClient.Core.Models.Entities
 {
     // Reference: https://github.com/bogdanfinn/tls-client/blob/master/cffi_src/types.go#L110
     public class PriorityFrame

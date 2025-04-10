@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TlsClient.Core.Models
+namespace TlsClient.Core.Models.Entities
 {
     // Reference: https://github.com/bogdanfinn/tls-client/blob/master/cffi_src/types.go#L92
     // Reference: https://bogdanfinn.gitbook.io/open-source-oasis/tls-client/custom-client-profile#shared-library-and-standalone-api

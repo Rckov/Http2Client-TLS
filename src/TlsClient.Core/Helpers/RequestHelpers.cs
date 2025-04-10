@@ -8,18 +8,18 @@ namespace TlsClient.Core.Helpers
 {
     public static class RequestHelpers
     {
-        public static DefaultContractResolver contractResolver = new DefaultContractResolver
+        private static readonly JsonSerializerSettings _jsonSettings = new JsonSerializerSettings
         {
-            NamingStrategy = new CamelCaseNamingStrategy()
-        };
-        public static byte[] Prepare(object data)
-        {
-            return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(data,new JsonSerializerSettings
+            NullValueHandling = NullValueHandling.Ignore,
+            Formatting = Formatting.Indented,
+            ContractResolver = new DefaultContractResolver
             {
-                NullValueHandling = NullValueHandling.Ignore,
-                Formatting = Formatting.Indented,
-                ContractResolver= contractResolver
-            }));
-        }
+                NamingStrategy = new CamelCaseNamingStrategy()
+            }
+        };
+
+        private static string ConvertJson(object data) => JsonConvert.SerializeObject(data, _jsonSettings);
+        private static byte[] GetBytes(string data) => Encoding.UTF8.GetBytes(data);
+        public static byte[] Prepare(object data) => GetBytes(ConvertJson(data));
     }
 }
