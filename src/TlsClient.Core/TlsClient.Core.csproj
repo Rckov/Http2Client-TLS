@@ -5,4 +5,16 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+	<ItemGroup>
+		<None Include="runtimes\win-x64\native\tls-client-latest.dll">
+			<Pack>true</Pack>
+			<PackagePath>runtimes\win-x64\native</PackagePath>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	  <PackageReference Include="System.Text.Json" Version="9.0.4" />
+	</ItemGroup>
 </Project>
