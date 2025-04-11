@@ -16,7 +16,7 @@ namespace TlsClient.Core.Models.Requests
         public Dictionary<string, List<string>> CertificatePinningHosts { get; set; }
         public CustomTlsClient? CustomTlsClient { get; set; }
         public TransportOptions? TransportOptions { get; set; }
-        public Dictionary<string, string>? Headers { get; set; }
+        public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
         public Dictionary<string, List<string>> DefaultHeaders { get; set; }
         public Dictionary<string, List<string>> ConnectHeaders { get; set; }
         public string? LocalAddress { get; set; }

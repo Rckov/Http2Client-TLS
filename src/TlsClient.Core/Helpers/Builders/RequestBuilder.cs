@@ -48,7 +48,7 @@ namespace TlsClient.Core.Helpers.Builders
         public RequestBuilder WithBody(byte[] bytes)
         {
             _request.IsByteRequest = true;
-            _request.RequestBody = Encoding.UTF8.GetString(bytes);
+            _request.RequestBody = RequestHelpers.PrepareBody(bytes);
             return this;
         }
 

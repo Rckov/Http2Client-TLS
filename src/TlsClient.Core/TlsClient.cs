@@ -19,8 +19,9 @@ namespace TlsClient.Core
     public class TlsClient : IDisposable
     {
         private IntPtr LoadedLibrary { get; set; } = IntPtr.Zero;
-        private TlsClientOptions Options { get; set; }
+        public TlsClientOptions Options { get; set; }
         public Dictionary<string, List<string>> DefaultHeaders => Options.DefaultHeaders;
+        
         public TlsClient(TlsClientOptions options)
         {
             Options = options ?? throw new ArgumentNullException(nameof(options));

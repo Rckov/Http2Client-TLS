@@ -19,6 +19,7 @@ namespace TlsClient.Core.Models.Entities
         public bool WithDebug { get; set; } = false;
         public bool WithDefaultCookieJar { get; set; } = false;
         public bool WithoutCookieJar { get; set; } = false;
+        public string UserAgent => DefaultHeaders["User-Agent"][0];
 
         public TlsClientOptions(TlsClientIdentifier clientIdentifier, string userAgent) : this()
         {

@@ -10,7 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="RestSharp" Version="112.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\TlsClient.Core\TlsClient.Core.csproj" />
+    <ProjectReference Include="..\..\src\TlsClient.HttpClient\TlsClient.HttpClient.csproj" />
   </ItemGroup>
 
 </Project>

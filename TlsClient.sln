@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F245E407
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TlsClient.Core.Tests", "tests\TlsClient.Core.Tests\TlsClient.Core.Tests.csproj", "{8F62A4F6-12A9-474A-8FCC-7406914D61F4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TlsClient.HttpClient", "src\TlsClient.HttpClient\TlsClient.HttpClient.csproj", "{9AD2B9E9-6673-429B-9529-DE1DC3C908DD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,14 @@ Global
 		{8F62A4F6-12A9-474A-8FCC-7406914D61F4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8F62A4F6-12A9-474A-8FCC-7406914D61F4}.Release|x64.ActiveCfg = Release|Any CPU
 		{8F62A4F6-12A9-474A-8FCC-7406914D61F4}.Release|x64.Build.0 = Release|Any CPU
+		{9AD2B9E9-6673-429B-9529-DE1DC3C908DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AD2B9E9-6673-429B-9529-DE1DC3C908DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AD2B9E9-6673-429B-9529-DE1DC3C908DD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9AD2B9E9-6673-429B-9529-DE1DC3C908DD}.Debug|x64.Build.0 = Debug|Any CPU
+		{9AD2B9E9-6673-429B-9529-DE1DC3C908DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AD2B9E9-6673-429B-9529-DE1DC3C908DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AD2B9E9-6673-429B-9529-DE1DC3C908DD}.Release|x64.ActiveCfg = Release|Any CPU
+		{9AD2B9E9-6673-429B-9529-DE1DC3C908DD}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -55,5 +65,6 @@ Global
 		{076F3A17-9860-466D-8F6E-42C60FB40868} = {4D0DFB67-95DB-4327-85D7-553D002EE28A}
 		{EEF1967F-3CB1-4582-A51E-19F3FB3CE082} = {4AE04384-B80E-4D12-99EF-E759FF8D862C}
 		{8F62A4F6-12A9-474A-8FCC-7406914D61F4} = {F245E407-5E9D-427E-98C8-D79116882421}
+		{9AD2B9E9-6673-429B-9529-DE1DC3C908DD} = {4D0DFB67-95DB-4327-85D7-553D002EE28A}
 	EndGlobalSection
 EndGlobal
