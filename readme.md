@@ -1,4 +1,4 @@
-# TlsClient.NET
+# [WIP] TlsClient.NET
 
 `TlsClient.NET` is a .NET library implementation of [bogdanfinn/tls-client](https://github.com/bogdanfinn/tls-client/), providing customizable HTTP clients with advanced TLS (Transport Layer Security) configurations. It allows you to mimic specific browser fingerprints and control detailed aspects of TLS behavior in your .NET applications.
 
@@ -23,7 +23,9 @@
 
 ### Installation
 
-You can install the package via NuGet:
+> **Note:** This project is still a Work In Progress (WIP) and is not yet published on NuGet. The installation instructions below will work once the packages are published.
+
+You can install the package via NuGet (when available):
 
 ```bash
 dotnet add package TlsClient.Core
@@ -34,6 +36,8 @@ Or add the project as a direct reference:
 ```bash
 dotnet add reference ../TlsClient.Core/TlsClient.Core.csproj
 ```
+
+For now, the best way to use the library is to clone the repository and reference the projects directly.
 
 ### Basic Usage
 

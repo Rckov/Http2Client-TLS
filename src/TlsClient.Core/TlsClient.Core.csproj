@@ -3,6 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
+	<Title>TlsClient.Core</Title>
+	<Authors>ErenKrt</Authors>
+	<PackageProjectUrl>https://github.com/ErenKrt/TlsClient.NET</PackageProjectUrl>
+	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	<Description>A C# port of TlsClient Go library.</Description>
   </PropertyGroup>
 
 	<ItemGroup>
