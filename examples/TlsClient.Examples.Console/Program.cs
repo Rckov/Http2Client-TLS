@@ -70,7 +70,7 @@ var client = new TlsClient.Core.TlsClient(clientOptions);
 var clientWithoutOptions= new TlsClient.Core.TlsClient();
 var cc= await client.RequestAsync(new Request()
 {
-    RequestUrl= "https://www.guzel.net.tr",
+    RequestUrl= "https://google.com",
     RequestMethod= HttpMethod.Get,
 });
 
@@ -92,8 +92,8 @@ var zz = await client4.RequestAsync(request);
 
 var hh = await client.RequestAsync(request);
 
- var ll= await client.GetCookiesAsync("https://www.guzel.net.tr");
-await client.AddCookiesAsync("https://www.guzel.net.tr", new List<TlsClientCookie>()
+ var ll= await client.GetCookiesAsync("https://google.com");
+await client.AddCookiesAsync("https://google.com", new List<TlsClientCookie>()
 {
     new TlsClientCookie("a","b")
 });
@@ -102,7 +102,7 @@ await client.AddCookiesAsync("https://www.guzel.net.tr", new List<TlsClientCooki
 //await client.DestroyAllAsync();
 client.Dispose();
 
-ll = await client.GetCookiesAsync("https://www.guzel.net.tr");
+ll = await client.GetCookiesAsync("https://google.com");
 
 var gg = "a";
 
@@ -110,7 +110,7 @@ using(var client2 = new TlsClient.Core.TlsClient())
 {
     var cc2 = await client2.RequestAsync(new Request()
     {
-        RequestUrl = "https://www.guzel.net.tr",
+        RequestUrl = "https://google.comr",
         RequestMethod = HttpMethod.Get,
         WithDebug = true,
     });
