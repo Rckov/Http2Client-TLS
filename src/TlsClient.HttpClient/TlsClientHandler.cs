@@ -16,10 +16,12 @@ namespace TlsClient.HttpClient
     public class TlsClientHandler : HttpClientHandler
     {
         private readonly Core.TlsClient _client;
+
         public TlsClientHandler(Core.TlsClient client)
         {
-            _client = client;
+            _client = client ?? throw new ArgumentNullException(nameof(client));
         }
+
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var tlsRequestBuilder = new RequestBuilder()
@@ -39,6 +41,7 @@ namespace TlsClient.HttpClient
                 }
             }
 
+            // Add headers
             foreach (var header in request.GetHeaderDictionary())
             {
                 tlsRequestBuilder.WithHeader(header.Key, header.Value);
@@ -46,16 +49,25 @@ namespace TlsClient.HttpClient
 
             // Adding cookies with header, native tls client not tested with cookiejar
             var cookies = this.CookieContainer?.GetAllCookies();
-            if (cookies?.Count() > 0)
+            if (cookies?.Any() == true)
             {
                 var cookieHeader = string.Join("; ", cookies.Select(cookie => $"{cookie.Name}={cookie.Value}"));
                 tlsRequestBuilder.WithHeader("Cookie", cookieHeader);
             }
 
             var tlsRequest= tlsRequestBuilder.Build();
-            
             var response = await _client.RequestAsync(tlsRequest, cancellationToken);
-           
+
+            // Validate response
+            if (response == null)
+            {
+                throw new Exception("Response was returned null from Native Tls Client");
+            }
+
+            if (response.Status == 0 && !response.Body.Contains("Timeout"))
+            {
+                throw new Exception(response.Body);
+            }
 
             var httpResponseMessage = new HttpResponseMessage
             {
@@ -64,7 +76,7 @@ namespace TlsClient.HttpClient
                 RequestMessage = request,
             };
 
-            if (!string.IsNullOrWhiteSpace(response.Body))
+            if (!string.IsNullOrWhiteSpace(response.Body) && response.Status!=0)
             {
                 var parsed = response.Body.ToParsedBase64();
                 httpResponseMessage.Content = new ByteArrayContent(Convert.FromBase64String(parsed.Item2));
@@ -75,7 +87,9 @@ namespace TlsClient.HttpClient
                 httpResponseMessage.Content = new ByteArrayContent(Array.Empty<byte>());
             }
 
-            foreach (var header in response.Headers)
+            // Add headers to response
+            var headers = response?.Headers ?? Enumerable.Empty<KeyValuePair<string, List<string>>>();
+            foreach (var header in headers)
             {
                 httpResponseMessage.Headers.TryAddWithoutValidation(header.Key, header.Value);
             }

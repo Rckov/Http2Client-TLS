@@ -11,7 +11,7 @@ namespace TlsClient.Core.Models.Entities
         public TlsClientIdentifier TlsClientIdentifier { get; set; } = TlsClientIdentifier.Chrome131;
         public string? ProxyURL { get; set; }
         public bool IsRotatingProxy { get; set; } = false;
-        public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(0);
+        public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(60);
         public bool FollowRedirects { get; set; } = false;
         public bool InsecureSkipVerify { get; set; } = false;
         public bool DisableIPV4 { get; set; } = false;

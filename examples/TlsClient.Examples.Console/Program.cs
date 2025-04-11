@@ -7,8 +7,25 @@ using TlsClient.Core.Models;
 using TlsClient.Core.Models.Entities;
 using TlsClient.Core.Models.Requests;
 using TlsClient.HttpClient;
+using TlsClient.RestSharp.Helpers.Builders;
 
-var tlsClient = new ClientBuilder()
+var tlsClient31= new TlsClientBuilder()
+    .WithIdentifier(TlsClientIdentifier.Chrome132)
+    .WithUserAgent("TestClient 1.0")
+    .WithFollowRedirects(false)
+    .Build();
+
+var myRestClient = new TlsRestClientBuilder()
+    .WithTlsClient(tlsClient31)
+    .WithBaseUrl("https://httpbin.org")
+    .Build();
+
+var restReq21 = new RestRequest("/cookies", Method.Get);
+var restResponse21 = await myRestClient.ExecuteAsync(restReq21);
+
+
+return;
+var tlsClient = new TlsClientBuilder()
     .WithIdentifier(TlsClientIdentifier.Chrome132)
     .WithUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 OPR/117.0.0.0")
     .WithTimeout(TimeSpan.FromSeconds(30))
@@ -36,8 +53,8 @@ var restResponse2 = await restClient.ExecuteAsync(restReq2);
 
 /*
 var postReq = new RestRequest("https://httpbin.org/post", Method.Post);
-postReq.AddParameter("eren", "31", ParameterType.GetOrPost);
-postReq.AddParameter("veren", "31", ParameterType.GetOrPost);
+postReq.AddParameter("eren", "30", ParameterType.GetOrPost);
+postReq.AddParameter("erenn", "52", ParameterType.GetOrPost);
 postReq.AddFile("myFile", "C:\\Users\\eren\\Desktop\\fotolar\\Untitled-1.png");
 postReq.AddFile("yourFile", "C:\\Users\\eren\\Desktop\\fotolar\\Untitled-1.png");
 //postReq.AddJsonBody(new { a = "b" });
@@ -57,7 +74,7 @@ var cc= await client.RequestAsync(new Request()
     RequestMethod= HttpMethod.Get,
 });
 
-var client4 = new ClientBuilder()
+var client4 = new TlsClientBuilder()
     .WithIdentifier(TlsClientIdentifier.Chrome132)
     .WithUserAgent("g0")
     .WithFollowRedirects(true)

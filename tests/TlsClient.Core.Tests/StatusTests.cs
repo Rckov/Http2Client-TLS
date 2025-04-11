@@ -12,7 +12,7 @@ namespace TlsClient.Tests
         [Fact]
         public async Task ShouldReturn200()
         {
-            var tlsClient = new ClientBuilder().Build();
+            var tlsClient = new TlsClientBuilder().Build();
             var response = await tlsClient.RequestAsync(new Request()
             {
                 RequestUrl = "https://httpbin.org/get",
@@ -37,7 +37,7 @@ namespace TlsClient.Tests
         [Fact]
         public async Task ShouldFollowRedirect_WithOptions()
         {
-            var tlsClient= new ClientBuilder()
+            var tlsClient= new TlsClientBuilder()
                 .WithIdentifier(TlsClientIdentifier.Chrome132)
                 .WithUserAgent("TestClient 1.0")
                 .WithFollowRedirects(true)

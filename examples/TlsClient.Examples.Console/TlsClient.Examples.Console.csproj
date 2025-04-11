@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\TlsClient.Core\TlsClient.Core.csproj" />
     <ProjectReference Include="..\..\src\TlsClient.HttpClient\TlsClient.HttpClient.csproj" />
+    <ProjectReference Include="..\..\src\TlsClient.RestSharp\TlsClient.RestSharp.csproj" />
   </ItemGroup>
 
 </Project>
