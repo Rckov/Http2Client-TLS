@@ -46,7 +46,7 @@ namespace TlsClient.Core.Helpers
             {
                 "win" => NativeWindowsMethods.LoadLibrary(libraryPath),
                 "linux" => throw new PlatformNotSupportedException("Linux loading not implemented yet"),
-                "osx" => throw new PlatformNotSupportedException("OSX loading not implemented yet"),
+                "osx" => NativeDarwinMethods.LoadLibrary(libraryPath),
                 _ => throw new PlatformNotSupportedException("Unsupported OS platform")
             };
 
