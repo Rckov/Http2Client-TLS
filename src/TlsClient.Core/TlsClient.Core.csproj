@@ -11,9 +11,9 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<None Include="runtimes\win-x64\native\tls-client-latest.dll">
+		<None Include="runtimes\**\*">
 			<Pack>true</Pack>
-			<PackagePath>runtimes\win-x64\native</PackagePath>
+			<PackagePath>runtimes\</PackagePath>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
