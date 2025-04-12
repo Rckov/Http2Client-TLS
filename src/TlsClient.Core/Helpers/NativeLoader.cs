@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using TlsClient.Core.Helpers.Natives;
@@ -8,18 +10,19 @@ namespace TlsClient.Core.Helpers
 {
     public class NativeLoader
     {
+        
         public static IntPtr LoadNativeAssembly()
         {
             string platform = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "win" :
                               RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "linux" :
-                              RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "osx" :
+                              RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "darwin" :
                               throw new PlatformNotSupportedException("Unsupported OS platform");
 
             string extension = platform switch
             {
                 "win" => "dll",
                 "linux" => "so",
-                "osx" => "dylib",
+                "darwin" => "dylib",
                 _ => throw new PlatformNotSupportedException("Unsupported OS platform")
             };
 
@@ -32,7 +35,12 @@ namespace TlsClient.Core.Helpers
                 _ => throw new PlatformNotSupportedException("Unsupported process architecture")
             };
 
-            string libraryPath = $"runtimes/{platform}-{architecture}/native/tls-client-latest.{extension}";
+            string libraryPath = $"runtimes/tls-client/{platform}/{architecture}/tls-client-latest.{extension}";
+
+            if(!File.Exists(libraryPath))
+            {
+                throw new DllNotFoundException($"The native library '{libraryPath}' was not found.");
+            }
 
             return platform switch
             {
