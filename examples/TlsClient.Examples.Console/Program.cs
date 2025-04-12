@@ -9,6 +9,27 @@ using TlsClient.Core.Models.Requests;
 using TlsClient.HttpClient;
 using TlsClient.RestSharp.Helpers.Builders;
 
+
+
+string platform = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "win" :
+                  RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "linux" :
+                  RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "darwin" :
+                  throw new PlatformNotSupportedException("Unsupported OS platform");
+
+string extension = platform switch
+{
+    "win" => "dll",
+    "linux" => "so",
+    "darwin" => "dylib",
+    _ => throw new PlatformNotSupportedException("Unsupported OS platform")
+};
+
+
+Console.WriteLine($"Platform: {platform}");
+Console.WriteLine($"Extension: {extension}");
+Console.WriteLine($"Architecture: {RuntimeInformation.ProcessArchitecture}");
+
+return;
 var tlsClient31= new TlsClientBuilder()
     .WithIdentifier(TlsClientIdentifier.Chrome132)
     .WithUserAgent("TestClient 1.0")
@@ -20,7 +41,7 @@ var myRestClient = new TlsRestClientBuilder()
     .WithBaseUrl("https://httpbin.org")
     .Build();
 
-var restReq21 = new RestRequest("/cookies", Method.Get);
+var restReq21 = new RestRequest("/get", Method.Get);
 var restResponse21 = await myRestClient.ExecuteAsync(restReq21);
 
 
