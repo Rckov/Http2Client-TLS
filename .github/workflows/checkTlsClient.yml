@@ -60,4 +60,5 @@ jobs:
         git config --global user.email "actions@github.com"
         git add tls-client-version.txt
         git commit -m "Update tls-client version to ${{ env.LATEST_TAG }}"
+        git remote set-url origin https://${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git
         git push
