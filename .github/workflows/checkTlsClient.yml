@@ -48,16 +48,14 @@ jobs:
           echo "SHOULD_CONTINUE=true" >> $GITHUB_ENV
         fi
 
-    - name: Exit if no update
-      if: env.SHOULD_CONTINUE == 'false'
-      run: exit 0
-
     - name: Update version file
+      if: env.SHOULD_CONTINUE == 'true'
       run: |
         echo "${{ env.LATEST_TAG }}" > tls-client-version.txt
         echo "Updated version file to ${{ env.LATEST_TAG }}"
 
     - name: Commit and push changes
+      if: env.SHOULD_CONTINUE == 'true'
       run: |
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
