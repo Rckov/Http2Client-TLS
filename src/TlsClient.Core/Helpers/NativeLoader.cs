@@ -45,7 +45,7 @@ namespace TlsClient.Core.Helpers
             return platform switch
             {
                 "win" => NativeWindowsMethods.LoadLibrary(libraryPath),
-                "linux" => throw new PlatformNotSupportedException("Linux loading not implemented yet"),
+                "linux" => NativeLinuxMethods.LoadLibrary(libraryPath),
                 "osx" => NativeDarwinMethods.LoadLibrary(libraryPath),
                 _ => throw new PlatformNotSupportedException("Unsupported OS platform")
             };
@@ -60,11 +60,11 @@ namespace TlsClient.Core.Helpers
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                throw new NotImplementedException("Linux unloading not implemented yet");
+                return NativeLinuxMethods.FreeLibrary(libraryHandle) == 0;
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                throw new NotImplementedException("OSX unloading not implemented yet");
+                return NativeDarwinMethods.FreeLibrary(libraryHandle) == 0;
             }
             else
             {
