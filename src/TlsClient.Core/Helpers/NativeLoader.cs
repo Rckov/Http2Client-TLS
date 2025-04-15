@@ -55,7 +55,7 @@ namespace TlsClient.Core.Helpers
             {
                 "win" => NativeWindowsMethods.LoadLibrary(libraryPath),
                 "linux" => NativeLinuxMethods.LoadLibrary(libraryPath),
-                "osx" => NativeDarwinMethods.LoadLibrary(libraryPath),
+                "darwin" => NativeDarwinMethods.LoadLibrary(libraryPath),
                 _ => throw new PlatformNotSupportedException("Unsupported OS platform")
             };
 
