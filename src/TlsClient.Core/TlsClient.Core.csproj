@@ -11,19 +11,7 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<None Include="runtimes\**\*">
-			<Pack>true</Pack>
-			<PackagePath>runtimes\</PackagePath>
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
-
-	<ItemGroup>
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	  <PackageReference Include="System.Text.Json" Version="9.0.4" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="runtimes\" />
 	</ItemGroup>
 </Project>

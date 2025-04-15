@@ -45,7 +45,7 @@ namespace TlsClient.Core.Helpers
                 }
             }
 
-            string relativeLibraryPath = $"runtimes/tls-client/{platform}/{architecture}/tls-client-latest.{extension}";
+            string relativeLibraryPath = $"runtimes/tls-client/{platform}/{architecture}/tls-client.{extension}";
             string libraryPath = Path.GetFullPath(relativeLibraryPath);
 
             if (!File.Exists(libraryPath))

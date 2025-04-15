@@ -19,7 +19,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y jq
+        sudo apt-get install -y jq gh tree
 
     - name: Get latest release info
       id: get_latest
@@ -53,6 +53,155 @@ jobs:
       run: |
         echo "${{ env.LATEST_TAG }}" > tls-client-version.txt
         echo "Updated version file to ${{ env.LATEST_TAG }}"
+
+    - name: Download and organize tls-client files
+      if: env.SHOULD_CONTINUE == 'true'
+      run: |
+        # Create temp directory for downloads
+        mkdir -p temp/tls-client
+
+        # Download the release files (excluding xgo)
+        assets=$(gh release view ${{ env.LATEST_TAG }} --repo bogdanfinn/tls-client --json assets -q '.assets[].name' | grep "tls-client-" | grep -v "xgo")
+        for asset in $assets; do
+          gh release download ${{ env.LATEST_TAG }} --repo bogdanfinn/tls-client --pattern "$asset" --dir temp/tls-client
+        done
+
+        # Process each downloaded file
+        for file in temp/tls-client/tls-client-*; do
+          filename=$(basename "$file")
+          echo "Processing $filename..."
+
+          # Get file extension
+          extension="${filename##*.}"
+
+          # Special handling for Linux distributions
+          if [[ $filename == *linux-ubuntu* || $filename == *linux-alpine* ]]; then
+            # For Linux distributions like ubuntu and alpine
+            if [[ $filename =~ tls-client-linux-([a-z]+)-([a-z0-9]+)- ]]; then
+              os="linux"
+              distro="${BASH_REMATCH[1]}"
+              arch="${BASH_REMATCH[2]}"
+
+              # Keep original arch name for Linux
+              arch_dir=$arch
+
+              # Set target directory - use distro in folder name
+              target_dir="src/native/TlsClient.Native.$os-$distro-$arch_dir/runtimes/tls-client/$os/$distro-$arch_dir"
+            fi
+          # Regular parsing for other OS/arch combinations
+          elif [[ $filename =~ tls-client-([^-]+)-([^-]+)- ]]; then
+            os="${BASH_REMATCH[1]}"
+            arch="${BASH_REMATCH[2]}"
+
+            # Map OS names
+            if [[ $os == "darwin" ]]; then
+              os_dir="osx"
+            elif [[ $os == "windows" ]]; then
+              os_dir="win"
+            elif [[ $os == "linux" ]]; then
+              os_dir="linux"
+            else
+              os_dir=$os
+            fi
+
+            # Only add 'x' prefix for Windows architectures
+            if [[ $os == "windows" ]]; then
+              if [[ $arch == "64" ]]; then
+                arch_dir="x64"
+              elif [[ $arch == "32" ]]; then
+                arch_dir="x32"
+              else
+                arch_dir="x$arch"
+              fi
+            else
+              # For non-Windows, keep original arch name
+              arch_dir=$arch
+            fi
+
+            # Set target directory
+            target_dir="src/native/TlsClient.Native.$os_dir-$arch_dir/runtimes/tls-client/$os_dir/$arch_dir"
+          else
+            echo "WARNING: Could not parse OS/arch from filename: $filename"
+            continue
+          fi
+
+          # Create target directory and copy file
+          mkdir -p "$target_dir"
+          cp "$file" "$target_dir/tls-client.$extension"
+          echo "Copied $filename to $target_dir/tls-client.$extension"
+        done
+
+        # Clean up temp directory
+        rm -rf temp
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Generate project files
+      if: env.SHOULD_CONTINUE == 'true'
+      run: |
+        # Find all created native directories
+        for dir in src/native/TlsClient.Native.*; do
+          if [ -d "$dir" ]; then
+            # Extract OS and architecture from directory name
+            dir_name=$(basename "$dir")
+
+            # Extract OS/arch or OS/distro/arch information
+            if [[ $dir_name == *linux-*-* ]]; then
+              # For Linux with distro: linux-ubuntu-amd64
+              IFS='-' read -r _ os_part distro_part arch_part <<< "$dir_name"
+              title="$os_part-$distro_part-$arch_part"
+              root_namespace="${os_part}_${distro_part}_${arch_part}"
+              description="${os_part^} ${distro_part^} ${arch_part}"
+            else
+              # For regular OS/arch: win-x64
+              IFS='-' read -r _ os_part arch_part <<< "$dir_name"
+              title="$os_part-$arch_part"
+              root_namespace="${os_part}_${arch_part}"
+              description="${os_part^} ${arch_part}"
+            fi
+
+            # Create csproj file from template
+            sed -e "s/{ROOT_NAMESPACE}/$root_namespace/g" \
+                -e "s/{TITLE}/$title/g" \
+                -e "s/{DESCRIPTION}/$description/g" \
+                src/native/template.csproj > "$dir/$dir_name.csproj"
+
+            echo "Created project file: $dir/$dir_name.csproj"
+          fi
+        done
+
+    - name: Show copied files
+      run: |
+        echo "Contents of src/native/TlsClient.Native directory:"
+        tree -L 10 src/native/
+
+    - name: Setup .NET
+      if: env.SHOULD_CONTINUE == 'true'
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Pack and publish native projects to NuGet
+      if: env.SHOULD_CONTINUE == 'true'
+      run: |
+        VERSION="0.1.0"
+        echo "Using version: $VERSION for all native packages"
+
+        # Find all .csproj files in native directories
+        for project in src/native/TlsClient.Native.*/*.csproj; do
+          echo "Packing project: $project"
+
+          # Pack the project with version 0.1.0
+          dotnet pack "$project" -c Release -p:Version=$VERSION -o packages
+
+          # Get the package name from the built package
+          package_name=$(basename "$project" .csproj)
+          package_path="packages/$package_name.$VERSION.nupkg"
+
+          # Push to NuGet
+          echo "Publishing package: $package_path"
+          dotnet nuget push "$package_path" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        done
 
     - name: Commit and push changes
       if: env.SHOULD_CONTINUE == 'true'

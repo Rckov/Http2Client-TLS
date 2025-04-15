@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <RootNamespace>${root_namespace}</RootNamespace>
+        <Nullable>enable</Nullable>
+        <Title>${dir_name}</Title>
+        <Authors>ErenKrt</Authors>
+        <PackageProjectUrl>https://github.com/ErenKrt/TlsClient.NET</PackageProjectUrl>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <Description>${description}</Description>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="runtimes\**\*">
+            <Pack>true</Pack>
+            <PackagePath>runtimes\</PackagePath>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+</Project>
