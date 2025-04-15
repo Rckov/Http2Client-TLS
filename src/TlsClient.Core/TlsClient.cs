@@ -21,11 +21,12 @@ namespace TlsClient.Core
         private IntPtr LoadedLibrary { get; set; } = IntPtr.Zero;
         public TlsClientOptions Options { get; set; }
         public Dictionary<string, List<string>> DefaultHeaders => Options.DefaultHeaders;
-        
+        private TlsClientWrapper _wrapper { get; set; }
         public TlsClient(TlsClientOptions options)
         {
             Options = options ?? throw new ArgumentNullException(nameof(options));
             LoadedLibrary = NativeLoader.LoadNativeAssembly();
+            _wrapper = new TlsClientWrapper(LoadedLibrary);
         }
 
         public TlsClient() : this(new TlsClientOptions(TlsClientIdentifier.Chrome132, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 OPR/117.0.0.0")) { }
@@ -62,11 +63,11 @@ namespace TlsClient.Core
                 }
             }
 
-            var rawResponse= await TlsClientAsyncWrapper.RequestAsync(RequestHelpers.Prepare(request), cancellationToken);
+            var rawResponse= await _wrapper.RequestAsync(RequestHelpers.Prepare(request), cancellationToken);
             var response = JsonConvert.DeserializeObject<Response>(rawResponse) ?? throw new Exception("Response is null, can't convert object from json.");
             
             // Need to free memory, because the native library allocates memory for the response
-            await TlsClientAsyncWrapper.FreeMemoryAsync(response.Id);
+            await _wrapper.FreeMemoryAsync(response.Id, cancellationToken);
             return response;
         }
 
@@ -83,7 +84,7 @@ namespace TlsClient.Core
                 Url = url,
             };
 
-            var rawResponse = await TlsClientAsyncWrapper.GetCookiesFromSessionAsync(RequestHelpers.Prepare(payload), cancellationToken);
+            var rawResponse = await _wrapper.GetCookiesFromSessionAsync(RequestHelpers.Prepare(payload), cancellationToken);
             return JsonConvert.DeserializeObject<GetCookiesFromSessionResponse>(rawResponse) ?? throw new Exception("Response is null, can't convert object from json.");
         }
 
@@ -94,13 +95,13 @@ namespace TlsClient.Core
                 SessionID = Options.SessionID,
             };
 
-            var rawResponse = await TlsClientAsyncWrapper.DestroySessionAsync(RequestHelpers.Prepare(payload), cancellationToken);
+            var rawResponse = await _wrapper.DestroySessionAsync(RequestHelpers.Prepare(payload), cancellationToken);
             return JsonConvert.DeserializeObject<DestroyResponse>(rawResponse) ?? throw new Exception("Response is null, can't convert object from json.");
         }
 
         public async Task<DestroyResponse> DestroyAllAsync(CancellationToken cancellationToken = default)
         {
-            var rawResponse = await TlsClientAsyncWrapper.DestroyAll(cancellationToken);
+            var rawResponse = await _wrapper.DestroyAllAsync(cancellationToken);
             return JsonConvert.DeserializeObject<DestroyResponse>(rawResponse) ?? throw new Exception("Response is null, can't convert object from json.");
         }
 
@@ -117,7 +118,7 @@ namespace TlsClient.Core
                 Url = url,
                 Cookies = cookies,
             };
-            var rawResponse = await TlsClientAsyncWrapper.AddCookiesToSessionAsync(RequestHelpers.Prepare(payload), cancellationToken);
+            var rawResponse = await _wrapper.AddCookiesToSessionAsync(RequestHelpers.Prepare(payload), cancellationToken);
             return JsonConvert.DeserializeObject<GetCookiesFromSessionResponse>(rawResponse) ?? throw new Exception("Response is null, can't convert object from json.");
         }
   
@@ -126,10 +127,10 @@ namespace TlsClient.Core
         {
             if(LoadedLibrary == IntPtr.Zero) return;
 
-            NativeLoader.FreeNativeAssembly(LoadedLibrary);
             DestroyAsync().GetAwaiter().GetResult();
-            LoadedLibrary = IntPtr.Zero;
+            _wrapper.Dispose();
 
+            LoadedLibrary = IntPtr.Zero;
             GC.SuppressFinalize(this);
         }
     }

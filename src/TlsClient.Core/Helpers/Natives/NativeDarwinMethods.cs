@@ -7,13 +7,9 @@ namespace TlsClient.Core.Helpers.Natives
 {
     public static class NativeDarwinMethods
     {
-        // ReSharper disable MemberHidesStaticFromOuterClass
-
         [Flags]
         public enum LoadLibraryFlags
         {
-            // ReSharper disable UnusedMember.Local
-
             None = 0,
             Lazy = 0x01,
             Now = 0x02,
@@ -21,8 +17,6 @@ namespace TlsClient.Core.Helpers.Natives
             Global = 0x08,
             NoLoad = 0x10,
             NoDelete = 0x80
-
-            // ReSharper restore UnusedMember.Local
         }
 
         [DllImport("libdl.dylib", EntryPoint = "dlopen")]
@@ -35,5 +29,8 @@ namespace TlsClient.Core.Helpers.Natives
         public static extern int FreeLibrary(
             [In] IntPtr hLibrary
         );
+
+        [DllImport("libdl.dylib", EntryPoint = "dlsym")]
+        public static extern IntPtr GetProcAddress([In]IntPtr handle, [In]string symbol);
     }
 }

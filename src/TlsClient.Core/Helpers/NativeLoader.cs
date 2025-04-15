@@ -10,13 +10,13 @@ namespace TlsClient.Core.Helpers
 {
     public class NativeLoader
     {
-        
         public static IntPtr LoadNativeAssembly()
         {
             string platform = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "win" :
                               RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "linux" :
                               RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "darwin" :
                               throw new PlatformNotSupportedException("Unsupported OS platform");
+
 
             string extension = platform switch
             {
@@ -35,9 +35,18 @@ namespace TlsClient.Core.Helpers
                 _ => throw new PlatformNotSupportedException("Unsupported process architecture")
             };
 
-            string libraryPath = $"runtimes/tls-client/{platform}/{architecture}/tls-client-latest.{extension}";
+            if (platform == "darwin")
+            {
+                if (architecture == "x64")
+                {
+                    architecture = "ubuntu-amd64";
+                }
+            }
 
-            if(!File.Exists(libraryPath))
+            string relativeLibraryPath = $"runtimes/tls-client/{platform}/{architecture}/tls-client-latest.{extension}";
+            string libraryPath = Path.GetFullPath(relativeLibraryPath);
+
+            if (!File.Exists(libraryPath))
             {
                 throw new DllNotFoundException($"The native library '{libraryPath}' was not found.");
             }
@@ -65,6 +74,25 @@ namespace TlsClient.Core.Helpers
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 return NativeDarwinMethods.FreeLibrary(libraryHandle) == 0;
+            }
+            else
+            {
+                throw new PlatformNotSupportedException("Unsupported OS platform");
+            }
+        }
+
+        public static IntPtr GetProcAddress(IntPtr handle, string name) {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return NativeWindowsMethods.GetProcAddress(handle, name);
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                throw new PlatformNotSupportedException("Unsupported OS platform");
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                return NativeDarwinMethods.GetProcAddress(handle, name);
             }
             else
             {
