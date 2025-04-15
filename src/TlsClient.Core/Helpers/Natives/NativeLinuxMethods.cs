@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -27,5 +28,26 @@ namespace TlsClient.Core.Helpers.Natives
         [DllImport("libdl.so.2", EntryPoint = "dlclose")]
         public static extern int FreeLibrary([In] IntPtr hLibrary);
 
+        [DllImport("libdl.so.2", EntryPoint = "dlsym")]
+        public static extern IntPtr GetProcAddress([In]IntPtr handle, [In]string symbol);
+    
+        public static string GetLinuxDistro()
+        {
+            const string osReleasePath = "/etc/os-release";
+
+            if (File.Exists(osReleasePath))
+            {
+                var lines = File.ReadAllLines(osReleasePath);
+                foreach (var line in lines)
+                {
+                    if (line.StartsWith("ID="))
+                    {
+                        return line.Substring(3).Trim('"').ToLower();
+                    }
+                }
+            }
+
+            return "UNKNOWN";
+        }
     }
 }

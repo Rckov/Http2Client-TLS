@@ -35,11 +35,13 @@ namespace TlsClient.Core.Helpers
                 _ => throw new PlatformNotSupportedException("Unsupported process architecture")
             };
 
-            if (platform == "darwin")
+            if (platform == "linux")
             {
-                if (architecture == "x64")
+                var distro = NativeLinuxMethods.GetLinuxDistro();
+
+                if (!string.Equals(distro, "UNKNOWN", StringComparison.OrdinalIgnoreCase))
                 {
-                    architecture = "ubuntu-amd64";
+                    architecture = $"{distro}-amd{architecture.Replace("x", string.Empty)}";
                 }
             }
 
@@ -88,7 +90,7 @@ namespace TlsClient.Core.Helpers
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                throw new PlatformNotSupportedException("Unsupported OS platform");
+                return NativeLinuxMethods.GetProcAddress(handle, name);
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
