@@ -30,8 +30,8 @@ jobs:
       - name: Pack
         run: dotnet pack --configuration Release /p:Version=${VERSION} --output .
 
-      - name: Push TlsClient
-        run: dotnet nuget push TlsClient.${VERSION}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${NUGET_API_KEY}
+      - name: Push TlsClient.Core
+        run: dotnet nuget push TlsClient.Core.${VERSION}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${NUGET_API_KEY}
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
 

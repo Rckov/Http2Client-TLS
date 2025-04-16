@@ -1,0 +1,10 @@
+{
+  "name": "native-builder",
+  "version": "0.0.1",
+  "scripts": {
+    "prepare": "node prepare.js"
+  },
+  "keywords": [],
+  "author": "ErenKrt",
+  "license": "ISC"
+}

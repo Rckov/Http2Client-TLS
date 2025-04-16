@@ -1,0 +1,11 @@
+<Project>
+	<Target Name="CopyTlsClientRuntimeFolder" AfterTargets="Build">
+		<ItemGroup>
+			<_RuntimeFiles Include="$(MSBuildThisFileDirectory)..\runtimes\tls-client\**\*.*" />
+		</ItemGroup>
+		<Copy
+		  SourceFiles="@(_RuntimeFiles)"
+		  DestinationFiles="@(_RuntimeFiles -> '$(OutputPath)runtimes\tls-client\%(RecursiveDir)%(Filename)%(Extension)')"
+		  SkipUnchangedFiles="true" />
+	</Target>
+</Project>
