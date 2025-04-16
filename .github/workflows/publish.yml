@@ -24,6 +24,9 @@ jobs:
         run: |
           sudo apt-get update
 
+      - name: Restore NuGet packages
+        run: dotnet restore
+
       - name: Build
         run: dotnet build --configuration Release --no-restore
 
