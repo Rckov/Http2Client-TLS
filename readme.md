@@ -1,4 +1,4 @@
-# [WIP] TlsClient.NET
+# TlsClient.NET
 
 `TlsClient.NET` is a .NET library implementation of [bogdanfinn/tls-client](https://github.com/bogdanfinn/tls-client/), providing customizable HTTP clients with advanced TLS (Transport Layer Security) configurations. It allows you to mimic specific browser fingerprints and control detailed aspects of TLS behavior in your .NET applications.
 
@@ -23,21 +23,44 @@
 
 ### Installation
 
-> **Note:** This project is still a Work In Progress (WIP) and is not yet published on NuGet. The installation instructions below will work once the packages are published.
-
-You can install the package via NuGet (when available):
+You can install the package via NuGet:
 
 ```bash
 dotnet add package TlsClient.Core
 ```
 
-Or add the project as a direct reference:
+#### Native Library Dependencies
+
+After installing the core package, you'll need to add the appropriate native library package for your operating system and architecture:
+
+| Operating System | Architecture | Package to Install |
+|------------------|--------------|-------------------|
+| Windows | x64 (64-bit) | `TlsClient.Native.win-x64` |
+| Windows | x86 (32-bit) | `TlsClient.Native.win-x32` |
+| Linux (Ubuntu) | AMD64 (64-bit) | `TlsClient.Native.linux-ubuntu-amd64` |
+| Linux | ARM64 | `TlsClient.Native.linux-arm64` |
+| Linux | ARMv7 | `TlsClient.Native.linux-armv7` |
+| Linux (Alpine) | AMD64 (64-bit) | `TlsClient.Native.linux-alpine-amd64` |
+| macOS | ARM64 (Apple Silicon) | `TlsClient.Native.darwin-arm64` |
+| macOS | AMD64 (Intel) | `TlsClient.Native.darwin-amd64` |
+
+For example, if you're developing on Windows with a 64-bit system:
 
 ```bash
-dotnet add reference ../TlsClient.Core/TlsClient.Core.csproj
+dotnet add package TlsClient.Native.win-x64
 ```
 
-For now, the best way to use the library is to clone the repository and reference the projects directly.
+Or, if you're developing on macOS with Apple Silicon:
+
+```bash
+dotnet add package TlsClient.Native.darwin-arm64
+```
+
+> **Important**: The native library package is required for the TlsClient to function properly. Without it, you'll receive a runtime error when attempting to use the library.
+
+> For more detailed information about the native libraries and their versions, you can visit the [bogdanfinn/tls-client releases page](https://github.com/bogdanfinn/tls-client/releases/).
+
+If you're targeting multiple platforms with your application, you should reference all the native packages you plan to support and ensure they're included in your deployment.
 
 ### Basic Usage
 
