@@ -120,7 +120,12 @@ jobs:
     - name: Pack and publish native projects to NuGet
       if: env.SHOULD_CONTINUE == 'true'
       run: |
-        VERSION="0.2.7"
+        # Extract version number from LATEST_TAG (remove 'v' prefix)
+        VERSION="${{ env.LATEST_TAG }}"
+        if [[ "$VERSION" == v* ]]; then
+          VERSION="${VERSION#v}"
+        fi
+
         echo "Using version: $VERSION for all native packages"
 
         # Create output directory
@@ -130,7 +135,7 @@ jobs:
         for project in src/native/TlsClient.Native.*/*.csproj; do
           echo "Packing project: $project"
 
-          # Pack the project with version 0.1.0
+          # Pack the project with the extracted version
           dotnet pack "$project" -c Release -p:Version=$VERSION --output packages
 
           if [ $? -ne 0 ]; then
