@@ -77,6 +77,8 @@ jobs:
         # List downloaded files
         echo "Downloaded files in build/temp:"
         ls -la build/temp/
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Update version file
       if: env.SHOULD_CONTINUE == 'true'
