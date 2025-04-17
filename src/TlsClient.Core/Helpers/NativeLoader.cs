@@ -17,7 +17,6 @@ namespace TlsClient.Core.Helpers
                               RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "darwin" :
                               throw new PlatformNotSupportedException("Unsupported OS platform");
 
-
             string extension = platform switch
             {
                 "win" => "dll",
@@ -37,29 +36,47 @@ namespace TlsClient.Core.Helpers
 
             if (platform == "linux")
             {
-                var distro = NativeLinuxMethods.GetLinuxDistro();
+                string distro = NativeLinuxMethods.GetLinuxDistro();
 
-                if (!string.Equals(distro, "UNKNOWN", StringComparison.OrdinalIgnoreCase))
+                architecture = architecture switch
                 {
-                    architecture = $"{distro}-amd{architecture.Replace("x", string.Empty)}";
+                    "x64" => "amd64",
+                    "x86" => "i386",
+                    "arm" => "armhf",
+                    "arm64" => "aarch64",
+                    _ => architecture
+                };
+
+                if (!distro.Equals("UNKNOWN", StringComparison.OrdinalIgnoreCase))
+                {
+                    platform = $"{platform}-{distro}";
+                    architecture = architecture.Replace("x", string.Empty);
                 }
             }
 
-            string relativeLibraryPath = $"runtimes/tls-client/{platform}/{architecture}/tls-client.{extension}";
-            string libraryPath = Path.GetFullPath(relativeLibraryPath);
+            string libraryPath = Path.GetFullPath($"runtimes/tls-client/{platform}/{architecture}/tls-client.{extension}");
 
             if (!File.Exists(libraryPath))
             {
                 throw new DllNotFoundException($"The native library '{libraryPath}' was not found.");
             }
 
-            return platform switch
+            if (platform == "win")
             {
-                "win" => NativeWindowsMethods.LoadLibrary(libraryPath),
-                "linux" => NativeLinuxMethods.LoadLibrary(libraryPath),
-                "darwin" => NativeDarwinMethods.LoadLibrary(libraryPath),
-                _ => throw new PlatformNotSupportedException("Unsupported OS platform")
-            };
+                return NativeWindowsMethods.LoadLibrary(libraryPath);
+            }
+            else if (platform == "linux" || platform == "linux-ubuntu" || platform == "linux-alpine")
+            {
+                return NativeLinuxMethods.LoadLibrary(libraryPath);
+            }
+            else if (platform == "darwin")
+            {
+                return NativeDarwinMethods.LoadLibrary(libraryPath);
+            }
+            else
+            {
+                throw new PlatformNotSupportedException("Unsupported OS platform");
+            }
 
         }
 

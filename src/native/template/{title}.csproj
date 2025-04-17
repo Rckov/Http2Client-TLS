@@ -11,7 +11,8 @@
 
 
     <ItemGroup>
-        <None Include="runtimes\tls-client\**\*.*" Pack="true" PackagePath="runtimes\tls-client" CopyToOutputDirectory="PreserveNewest"/>
+        <None Include="runtimes\tls-client\{os}\{arch}\tls-client.{ext}" Pack="true"
+            PackagePath="runtimes\tls-client\{os}\{arch}" CopyToOutputDirectory="PreserveNewest" />
         <None Include="buildTransitive\{title}.targets" Pack="true" PackagePath="buildTransitive\" />
     </ItemGroup>
 

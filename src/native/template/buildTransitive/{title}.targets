@@ -1,11 +1,18 @@
 <Project>
-	<Target Name="CopyTlsClientRuntimeFolder" AfterTargets="Build">
+	<PropertyGroup>
+		<_DllPath>$([System.IO.Path]::Combine('$(MSBuildThisFileDirectory)', '..', 'runtimes','tls-client', '{os}', '{arch}', 'tls-client.{ext}'))</_DllPath>
+	</PropertyGroup>
+
+	<Target Name="CopyTlsClient{os}{arch}{ext}" BeforeTargets="Build;Publish"
+		Condition="'$(RuntimeIdentifier)' == '{runtimeIdentifier}'">
+
 		<ItemGroup>
-			<_RuntimeFiles Include="$(MSBuildThisFileDirectory)..\runtimes\tls-client\**\*.*" />
+			<_Dll Include="$(_DllPath)" />
 		</ItemGroup>
+
 		<Copy
-		  SourceFiles="@(_RuntimeFiles)"
-		  DestinationFiles="@(_RuntimeFiles -> '$(OutputPath)runtimes\tls-client\%(RecursiveDir)%(Filename)%(Extension)')"
-		  SkipUnchangedFiles="true" />
+			SourceFiles="@(_Dll)"
+			DestinationFolder="$(OutputPath)runtimes\tls-client\{os}\{arch}"
+			SkipUnchangedFiles="false" />
 	</Target>
 </Project>

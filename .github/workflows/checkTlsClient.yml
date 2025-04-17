@@ -92,7 +92,7 @@ jobs:
     - name: Pack and publish native projects to NuGet
       if: env.SHOULD_CONTINUE == 'true'
       run: |
-        VERSION="0.2.4"
+        VERSION="0.2.7"
         echo "Using version: $VERSION for all native packages"
 
         # Create output directory

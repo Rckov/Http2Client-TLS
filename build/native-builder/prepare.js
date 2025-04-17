@@ -71,11 +71,16 @@ async function processLibraries() {
         if (!match) return null;
 
         let [, os, arch, ext] = match;
-
+        var runtimeIdentifier;
         // Normalize OS and architecture names
         if (os === 'windows') {
           os = 'win';
           arch = `x${arch}`;
+          runtimeIdentifier = `win-${arch === 'x64' ? 'x64' : 'x86'}`;
+        }else if (os.includes('linux')) {
+          runtimeIdentifier = `linux-${arch === 'amd64' ? 'x64' : (arch === 'arm64' ? 'arm64' : 'arm')}`;
+        }else if (os === 'darwin') {
+          runtimeIdentifier = `osx-${arch === 'amd64' ? 'x64' : 'arm64'}`;
         }
 
         const fullName = `TlsClient.Native.${os}-${arch}`;
@@ -86,7 +91,8 @@ async function processLibraries() {
           os,
           arch,
           ext,
-          sourcePath
+          sourcePath,
+          runtimeIdentifier,
         };
       })
       .filter(Boolean); // Filter out null values more concisely
@@ -105,7 +111,8 @@ async function processLibraries() {
         os: lib.os,
         arch: lib.arch,
         version: tlsVersion,
-        ext: lib.ext
+        ext: lib.ext,
+        runtimeIdentifier: lib.runtimeIdentifier,
       };
 
       // Create the project structure with template replacements
