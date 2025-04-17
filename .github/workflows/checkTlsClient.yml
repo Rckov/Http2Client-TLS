@@ -49,6 +49,45 @@ jobs:
           echo "SHOULD_CONTINUE=true" >> $GITHUB_ENV
         fi
 
+    - name: Download tls-client libraries
+      if: env.SHOULD_CONTINUE == 'true'
+      run: |
+        # Create temp directory for downloads
+        mkdir -p build/temp
+
+        # Get all releases
+        echo "Fetching releases from bogdanfinn/tls-client..."
+        RELEASES_JSON=$(curl -s https://api.github.com/repos/bogdanfinn/tls-client/releases)
+
+        # Process each release
+        echo "$RELEASES_JSON" | jq -c '.[]' | while read -r release; do
+          tag_name=$(echo "$release" | jq -r '.tag_name')
+          echo "Processing release: $tag_name"
+
+          # Get assets for this release
+          assets=$(echo "$release" | jq -r '.assets[].name' | grep -v "xgo")
+
+          for asset in $assets; do
+            echo "Downloading $asset..."
+
+            # Get download URL for asset
+            download_url=$(echo "$release" | jq -r ".assets[] | select(.name == \"$asset\") | .browser_download_url")
+
+            # Download asset to build/temp
+            wget -q "$download_url" -O "build/temp/$asset"
+
+            if [ $? -eq 0 ]; then
+              echo "Downloaded $asset successfully"
+            else
+              echo "Failed to download $asset"
+            fi
+          done
+        done
+
+        # List downloaded files
+        echo "Downloaded files in build/temp:"
+        ls -la build/temp/
+
     - name: Update version file
       if: env.SHOULD_CONTINUE == 'true'
       run: |
@@ -64,16 +103,13 @@ jobs:
     - name: Run native-builder script
       if: env.SHOULD_CONTINUE == 'true'
       run: |
-        # Create temp directory for downloads
-        mkdir -p build/temp
-
         # Pass the version to the Node.js script via environment variable
         export TLS_CLIENT_VERSION="${{ env.LATEST_TAG }}"
 
         # Run the prepare script
         cd build/native-builder
         npm install
-        npm run prepare
+        npm run prepare-libraries
 
         echo "Native libraries preparation completed"
 

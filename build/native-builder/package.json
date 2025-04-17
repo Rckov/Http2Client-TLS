@@ -2,7 +2,7 @@
   "name": "native-builder",
   "version": "0.0.1",
   "scripts": {
-    "prepare": "node prepare.js"
+    "prepare-libraries": "node prepare.js"
   },
   "keywords": [],
   "author": "ErenKrt",
