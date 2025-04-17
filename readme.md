@@ -56,11 +56,14 @@ Or, if you're developing on macOS with Apple Silicon:
 dotnet add package TlsClient.Native.darwin-arm64
 ```
 
+
 > **Important**: The native library package is required for the TlsClient to function properly. Without it, you'll receive a runtime error when attempting to use the library.
 
 > For more detailed information about the native libraries and their versions, you can visit the [bogdanfinn/tls-client releases page](https://github.com/bogdanfinn/tls-client/releases/).
 
-If you're targeting multiple platforms with your application, you should reference all the native packages you plan to support and ensure they're included in your deployment.
+> **Note**: After adding a native library dependency, please verify it exists in your build or publish directory. All native versions are automatically built and published to NuGet, but C# support varies across different operating systems and architectures. The NuGet versions of these native libraries are kept synchronized with the original repository's releases.
+
+> **Important**: When building your application, remember to specify the RuntimeIdentifier that matches your target platform. For example, use `dotnet publish -r win-x64` for Windows 64-bit builds. This ensures the correct native libraries are included in your published application.
 
 ### Basic Usage
 
