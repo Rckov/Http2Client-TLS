@@ -12,7 +12,10 @@ namespace TlsClient.Tests
         [Fact]
         public async Task ShouldUserAgent()
         {
-            var tlsClient = new Core.TlsClient(new TlsClientOptions(TlsClientIdentifier.Chrome132, "TestClient 1.0"));
+            var tlsClient = new Core.TlsClient(new TlsClientOptions(TlsClientIdentifier.Chrome132, "TestClient 1.0")
+            {
+                LibraryPath= "C:\\Users\\Eren\\Documents\\GitHub\\TlsClient\\examples\\TlsClient.Examples.Console\\bin\\x64\\Debug\\net8.0\\win-x64\\runtimes\\tls-client\\win\\x64\\tls-client.dll"
+            });
             var response = await tlsClient.RequestAsync(new Request()
             {
                 RequestUrl = "https://httpbin.org/user-agent",

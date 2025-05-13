@@ -25,7 +25,7 @@ namespace TlsClient.Core
         public TlsClient(TlsClientOptions options)
         {
             Options = options ?? throw new ArgumentNullException(nameof(options));
-            LoadedLibrary = NativeLoader.LoadNativeAssembly();
+            LoadedLibrary = NativeLoader.LoadNativeAssembly(options.LibraryPath);
             _wrapper = new TlsClientWrapper(LoadedLibrary);
         }
 
