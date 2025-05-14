@@ -89,6 +89,12 @@ namespace TlsClient.Core.Helpers.Builders
             return this;
         }
 
+        public TlsClientBuilder WithLibraryPath(string path)
+        {
+            _options.LibraryPath = path;
+            return this;
+        }
+
         public TlsClient Build()
         {
             return new TlsClient(_options);
