@@ -18,7 +18,7 @@ namespace TlsClient.Core.Helpers
             }
         };
 
-        private static string ConvertJson(object data) => JsonConvert.SerializeObject(data, _jsonSettings);
+        public static string ConvertJson(object data) => JsonConvert.SerializeObject(data, _jsonSettings);
         private static byte[] GetBytes(string data) => Encoding.UTF8.GetBytes(data);
         public static byte[] Prepare(object data) => GetBytes(ConvertJson(data));
         public static string PrepareBody(byte[] data) => Convert.ToBase64String(data);

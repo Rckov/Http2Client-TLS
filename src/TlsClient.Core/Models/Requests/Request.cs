@@ -32,7 +32,7 @@ namespace TlsClient.Core.Models.Requests
         public HttpMethod RequestMethod { get; set; } = HttpMethod.Get;
         public string RequestUrl { get; set; } = string.Empty;
         [JsonConverter(typeof(JsonStringConverter<TlsClientIdentifier>))]
-        public TlsClientIdentifier TlsClientIdentifier { get; set; } = TlsClientIdentifier.Chrome131;
+        public TlsClientIdentifier TlsClientIdentifier { get; set; } = null;
         public List<string> HeaderOrder { get; set; } = new List<string>();
         public List<TlsClientCookie> RequestCookies { get; set; } = new List<TlsClientCookie>();
         public int? TimeoutMilliseconds { get; set; }

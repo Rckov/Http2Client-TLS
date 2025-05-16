@@ -12,6 +12,7 @@ namespace TlsClient.RestSharp.Helpers.Builders
         private Core.TlsClient _tlsClient { get; set; }
         private bool _isUseCookieContainer { get; set; } = false;
         private Uri _baseUrl { get; set; }
+        private Action<RestClientOptions> _configureRestClient { get; set; }
         public TlsRestClientBuilder WithTlsClient(Core.TlsClient tlsClient)
         {
             _tlsClient = tlsClient;
@@ -33,6 +34,12 @@ namespace TlsClient.RestSharp.Helpers.Builders
             return this;
         }
 
+        public TlsRestClientBuilder WithConfigureRestClient(Action<RestClientOptions> configureRestClient)
+        {
+            _configureRestClient = configureRestClient;
+            return this;
+        }
+
         public RestClient Build()
         {
             if(_tlsClient == null)
@@ -42,21 +49,25 @@ namespace TlsClient.RestSharp.Helpers.Builders
 
             var _tlsHandler = new TlsClientHandler(_tlsClient);
 
-            var client = new RestClient(_tlsHandler, configureRestClient: (x) =>
+            var client = new RestClient(handler:_tlsHandler, configureRestClient: (options) =>
             {
-                x.BaseUrl = _baseUrl;
-                x.UserAgent = _tlsClient.Options.UserAgent;
-                x.Timeout = _tlsClient.Options.Timeout;
-                x.FollowRedirects = _tlsClient.Options.FollowRedirects;
+                options.BaseUrl = _baseUrl;
+                options.UserAgent = _tlsClient.Options.UserAgent;
+                options.Timeout = _tlsClient.Options.Timeout;
+                options.FollowRedirects = _tlsClient.Options.FollowRedirects;
 
                 if (_tlsClient.Options.InsecureSkipVerify)
                 {
-                    x.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+                    options.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
                 }
-
                 if (_isUseCookieContainer)
                 {
-                    x.CookieContainer = _tlsHandler.CookieContainer;
+                    options.CookieContainer = new System.Net.CookieContainer();
+                }
+
+                if (_configureRestClient != null)
+                {
+                    _configureRestClient(options);
                 }
             });
 

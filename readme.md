@@ -124,6 +124,8 @@ TlsClient supports multiple browser fingerprints through the `TlsClientIdentifie
 | `WithDefaultCookieJar(bool enabled = true)` | Enables the default cookie jar. |
 | `WithoutCookieJar(bool enabled = true)` | Disables all cookie management. |
 | `AddHeader(string key, string value)` | Adds a custom HTTP header. |
+| `WithLibraryPath(string path)` | Sets a custom path to the native library. |
+| `WithCustomTlsClient(CustomTlsClient customTlsClient)` | Configures a custom TLS client implementation. |
 
 ### Advanced Example
 
@@ -138,6 +140,8 @@ var tlsClient = new TlsClientBuilder()
     .WithSkipTlsVerification(false)
     .DisableIPV6(true)
     .AddHeader("X-Custom-Header", "MyValue")
+    .WithLibraryPath("/custom/path/to/tls-client.so")
+    .WithCustomTlsClient(new MyCustomTlsClient())
     .Build();
 ```
 
@@ -205,6 +209,13 @@ var tlsClient = new TlsClientBuilder()
 var restClient = new TlsRestClientBuilder()
     .WithBaseUrl("https://httpbin.org")
     .WithTlsClient(tlsClient)
+    /*.WithConfigureRestClient((x) =>
+    {
+        x.Interceptors= new List<Interceptor>()
+        {
+            new TestInterceptor()
+        };
+    })*/
     .Build();
 
 // Use standard RestSharp request objects
@@ -221,6 +232,7 @@ var response = await restClient.ExecuteAsync(request);
 |--------|-------------|
 | `WithBaseUrl(string url)` | Sets the base URL for all requests. |
 | `WithTlsClient(TlsClient)` | Configures the RestClient to use the specified TlsClient instance. |
+| `WithConfigureRestClient(Action<RestClientOptions> configureRestClient)` | Allows customization of RestClient options. |
 | `Build()` | Creates and returns the configured RestClient. |
 
 For more comprehensive examples of TlsClient.RestSharp in action, including timeout handling, JSON serialization, and more advanced scenarios, please check the [testing directory](https://github.com/ErenKrt/TlsClient.NET/tree/master/tests/TlsClient.RestSharp.Tests) in the GitHub repository.

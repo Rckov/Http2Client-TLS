@@ -36,9 +36,8 @@ namespace TlsClient.Core
             {
                 throw new ArgumentNullException(nameof(request.RequestUrl));
             }
-
-            request.SessionId ??= Options.SessionID;
             request.TlsClientIdentifier ??= Options.TlsClientIdentifier;
+            request.SessionId ??= Options.SessionID;
             request.TimeoutMilliseconds ??= (int)Options.Timeout.TotalMilliseconds;
             request.ProxyUrl ??= Options.ProxyURL;
             request.IsRotatingProxy ??= Options.IsRotatingProxy;
@@ -49,6 +48,12 @@ namespace TlsClient.Core
             request.WithDebug ??= Options.WithDebug;
             request.WithDefaultCookieJar ??= Options.WithDefaultCookieJar;
             request.WithoutCookieJar ??= Options.WithoutCookieJar;
+            request.CustomTlsClient ??= Options.CustomTlsClient;
+
+            if(request.CustomTlsClient != null) // If CustomTlsClient is not null, TlsClientIdentifier should be null
+            {
+                request.TlsClientIdentifier = default!;
+            }
 
             // DefaultHeaders prop is not working
             request.DefaultHeaders ??= Options.DefaultHeaders;
@@ -62,7 +67,6 @@ namespace TlsClient.Core
                     request.Headers.Add(header.Key, header.Value[0]);
                 }
             }
-
             var rawResponse= await _wrapper.RequestAsync(RequestHelpers.Prepare(request), cancellationToken);
             var response = JsonConvert.DeserializeObject<Response>(rawResponse) ?? throw new Exception("Response is null, can't convert object from json.");
             

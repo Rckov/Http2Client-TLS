@@ -94,6 +94,11 @@ namespace TlsClient.Core.Helpers.Builders
             _options.LibraryPath = path;
             return this;
         }
+        public TlsClientBuilder WithCustomTlsClient(CustomTlsClient customTlsClient)
+        {
+            _options.CustomTlsClient = customTlsClient;
+            return this;
+        }
 
         public TlsClient Build()
         {

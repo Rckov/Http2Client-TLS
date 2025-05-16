@@ -6,6 +6,7 @@ namespace TlsClient.Core.Models.Entities
 {
     public class TlsClientOptions
     {
+        public CustomTlsClient? CustomTlsClient { get; set; } = null;
         public Dictionary<string, List<string>> DefaultHeaders { get; set; }
         public Guid SessionID { get; set; }
         public TlsClientIdentifier TlsClientIdentifier { get; set; } = TlsClientIdentifier.Chrome131;
@@ -32,6 +33,16 @@ namespace TlsClient.Core.Models.Entities
         {
             DefaultHeaders = new Dictionary<string, List<string>>();
             SessionID = Guid.NewGuid();
+        }
+
+        public TlsClientOptions(CustomTlsClient customClient, string userAgent= "") : this()
+        {
+            if (!string.IsNullOrEmpty(userAgent))
+            {
+                DefaultHeaders["User-Agent"] = new List<string> { userAgent };
+            }
+
+            CustomTlsClient= customClient;
         }
     }
 }
