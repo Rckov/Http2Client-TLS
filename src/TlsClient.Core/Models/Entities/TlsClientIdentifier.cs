@@ -22,6 +22,7 @@ namespace TlsClient.Core.Models.Entities
         public static readonly TlsClientIdentifier Chrome117 = new TlsClientIdentifier("chrome_117");
         public static readonly TlsClientIdentifier Chrome120 = new TlsClientIdentifier("chrome_120");
         public static readonly TlsClientIdentifier Chrome124 = new TlsClientIdentifier("chrome_124");
+        public static readonly TlsClientIdentifier Chrome130Psk = new TlsClientIdentifier("chrome_130_PSK");
         public static readonly TlsClientIdentifier Chrome131 = new TlsClientIdentifier("chrome_131");
         public static readonly TlsClientIdentifier Chrome132 = new TlsClientIdentifier("chrome_132");
         public static readonly TlsClientIdentifier Chrome131Psk = new TlsClientIdentifier("chrome_131_PSK");
@@ -38,6 +39,7 @@ namespace TlsClient.Core.Models.Entities
         public static readonly TlsClientIdentifier SafariIos160 = new TlsClientIdentifier("safari_ios_16_0");
         public static readonly TlsClientIdentifier SafariIos170 = new TlsClientIdentifier("safari_ios_17_0");
         public static readonly TlsClientIdentifier SafariIos180 = new TlsClientIdentifier("safari_ios_18_0");
+        public static readonly TlsClientIdentifier SafariIos185 = new TlsClientIdentifier("safari_ios_18_5");
         #endregion
 
         #region Firefox Profiles
