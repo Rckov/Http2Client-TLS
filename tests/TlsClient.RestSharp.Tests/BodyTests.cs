@@ -34,6 +34,7 @@ namespace TlsClient.RestSharp.Tests
                 .WithIdentifier(TlsClientIdentifier.Chrome132)
                 .WithUserAgent("TestClient 1.0")
                 .WithFollowRedirects(true)
+                .WithLibraryPath("D:\\Tools\\TlsClient\\tls-client-windows-64-1.9.1.dll")
                 .Build();
 
             var restClient = new TlsRestClientBuilder()
@@ -58,6 +59,7 @@ namespace TlsClient.RestSharp.Tests
                 .WithIdentifier(TlsClientIdentifier.Chrome132)
                 .WithUserAgent("TestClient 1.0")
                 .WithFollowRedirects(true)
+                .WithLibraryPath("D:\\Tools\\TlsClient\\tls-client-windows-64-1.9.1.dll")
                 .Build();
             var restClient = new TlsRestClientBuilder()
                 .WithBaseUrl("https://httpbin.org")
@@ -84,6 +86,7 @@ namespace TlsClient.RestSharp.Tests
                 .WithIdentifier(TlsClientIdentifier.Chrome132)
                 .WithUserAgent("TestClient 1.0")
                 .WithFollowRedirects(true)
+                .WithLibraryPath("D:\\Tools\\TlsClient\\tls-client-windows-64-1.9.1.dll")
                 .Build();
             var restClient = new TlsRestClientBuilder()
                 .WithBaseUrl("https://httpbin.org")
@@ -107,6 +110,7 @@ namespace TlsClient.RestSharp.Tests
                 .WithIdentifier(TlsClientIdentifier.Chrome132)
                 .WithUserAgent("TestClient 1.0")
                 .WithFollowRedirects(true)
+                .WithLibraryPath("D:\\Tools\\TlsClient\\tls-client-windows-64-1.9.1.dll")
                 .Build();
             var restClient = new TlsRestClientBuilder()
                 .WithBaseUrl("https://httpbin.org")
@@ -131,6 +135,7 @@ namespace TlsClient.RestSharp.Tests
                 .WithIdentifier(TlsClientIdentifier.Chrome132)
                 .WithUserAgent("TestClient 1.0")
                 .WithFollowRedirects(true)
+                .WithLibraryPath("D:\\Tools\\TlsClient\\tls-client-windows-64-1.9.1.dll")
                 .Build();
             var restClient = new TlsRestClientBuilder()
                 .WithBaseUrl("https://httpbin.org")
@@ -157,6 +162,7 @@ namespace TlsClient.RestSharp.Tests
                 .WithIdentifier(TlsClientIdentifier.Chrome132)
                 .WithUserAgent("TestClient 1.0")
                 .WithFollowRedirects(true)
+                .WithLibraryPath("D:\\Tools\\TlsClient\\tls-client-windows-64-1.9.1.dll")
                 .Build();
             var restClient = new TlsRestClientBuilder()
                 .WithBaseUrl("https://httpbin.org")

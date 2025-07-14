@@ -25,7 +25,7 @@ namespace TlsClient.HttpClient
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var tlsRequestBuilder = new RequestBuilder()
-                .WithUrl(request.RequestUri.ToString())
+                .WithUrl(request.RequestUri.AbsoluteUri.ToString())
                 .WithMethod(request.Method)
                 .WithByteRequest()
                 .WithByteResponse();
