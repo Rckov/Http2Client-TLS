@@ -76,11 +76,14 @@ namespace TlsClient.HttpClient
                 RequestMessage = request,
             };
 
-            if (!string.IsNullOrWhiteSpace(response.Body) && response.Status!=0)
+            if (!string.IsNullOrWhiteSpace(response.Body) && response.IsSuccessStatus)
             {
                 var parsed = response.Body.ToParsedBase64();
-                httpResponseMessage.Content = new ByteArrayContent(Convert.FromBase64String(parsed.Item2));
-                httpResponseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue(parsed.Item1);
+                if(!string.IsNullOrEmpty(parsed.Item1) && !string.IsNullOrEmpty(parsed.Item2))
+                {
+                    httpResponseMessage.Content = new ByteArrayContent(Convert.FromBase64String(parsed.Item2));
+                    httpResponseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue(parsed.Item1);
+                }
             }
             else
             {

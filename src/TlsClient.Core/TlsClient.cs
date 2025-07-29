@@ -67,11 +67,26 @@ namespace TlsClient.Core
                     request.Headers.Add(header.Key, header.Value[0]);
                 }
             }
-            var rawResponse= await _wrapper.RequestAsync(RequestHelpers.Prepare(request), cancellationToken);
-            var response = JsonConvert.DeserializeObject<Response>(rawResponse) ?? throw new Exception("Response is null, can't convert object from json.");
-            
-            // Need to free memory, because the native library allocates memory for the response
-            await _wrapper.FreeMemoryAsync(response.Id, cancellationToken);
+
+            Response response;
+
+            try
+            {
+                var rawResponse = await _wrapper.RequestAsync(RequestHelpers.Prepare(request), cancellationToken);
+                response = JsonConvert.DeserializeObject<Response>(rawResponse) ?? throw new Exception("Response is null, can't convert object from json.");
+            }
+            catch(Exception err)
+            {
+                response = new Response()
+                {
+                    Body = err.Message,
+                    Status = 0,
+                };
+            }
+
+            if(!string.IsNullOrEmpty(response.Id))
+                await _wrapper.FreeMemoryAsync(response.Id, cancellationToken);
+
             return response;
         }
 
