@@ -6,12 +6,12 @@ using System.ComponentModel;
 namespace Http2Client.Extensions;
 
 /// <summary>
-/// Extension methods for <see cref="BrowserType"/> enum. Handles string conversion.
+/// Extension methods for BrowserType enum string conversion.
 /// </summary>
 public static class BrowserTypeExtension
 {
     /// <summary>
-    /// Get the string value from the description attribute.
+    /// Gets string value from description attribute.
     /// </summary>
     public static string GetValue(this BrowserType identifier)
     {
@@ -21,7 +21,7 @@ public static class BrowserTypeExtension
     }
 
     /// <summary>
-    /// Parse string value back to enum. Handles both enum names and description values.
+    /// Parses string to enum. Handles names and descriptions.
     /// </summary>
     public static BrowserType FromString(string value)
     {
@@ -52,7 +52,7 @@ public static class BrowserTypeExtension
     }
 
     /// <summary>
-    /// Check if a string is a valid browser type.
+    /// Checks if string is valid browser type.
     /// </summary>
     public static bool IsValid(string value)
     {

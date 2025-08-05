@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace Http2Client.Core.Response;
 
 /// <summary>
-/// HTTP response with all the data you need. Includes helpers for common tasks.
+/// HTTP response with helper methods for common tasks.
 /// </summary>
 /// <remarks>
 /// Corresponds to the Go <c>Response</c> struct in the original library:
@@ -14,62 +14,62 @@ namespace Http2Client.Core.Response;
 public class HttpResponse
 {
     /// <summary>
-    /// Unique response ID that matches the request ID.
+    /// Response ID matching the request.
     /// </summary>
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;
 
     /// <summary>
-    /// Response body as string. Empty if it was a binary response.
+    /// Response body as string. Empty for binary responses.
     /// </summary>
     [JsonPropertyName("body")]
     public string Body { get; set; } = string.Empty;
 
     /// <summary>
-    /// HTTP status code like 200, 404, etc.
+    /// HTTP status code (200, 404, etc).
     /// </summary>
     [JsonPropertyName("status")]
     public HttpStatusCode Status { get; set; }
 
     /// <summary>
-    /// All response headers. Some headers can have multiple values.
+    /// Response headers. Headers can have multiple values.
     /// </summary>
     [JsonPropertyName("headers")]
     public Dictionary<string, List<string>> Headers { get; set; } = [];
 
     /// <summary>
-    /// Cookies from Set-Cookie headers, parsed for convenience.
+    /// Parsed cookies from Set-Cookie headers.
     /// </summary>
     [JsonPropertyName("cookies")]
     public Dictionary<string, string> Cookies { get; set; } = [];
 
     /// <summary>
-    /// Session ID this response belongs to.
+    /// Session ID for this response.
     /// </summary>
     [JsonPropertyName("sessionId")]
     public string? SessionId { get; set; }
 
     /// <summary>
-    /// Final URL after redirects.
+    /// Final URL after following redirects.
     /// </summary>
     [JsonPropertyName("target")]
     public string Target { get; set; } = string.Empty;
 
     /// <summary>
-    /// HTTP version used (HTTP/1.1, HTTP/2, etc).
+    /// HTTP protocol version used.
     /// </summary>
     [JsonPropertyName("usedProtocol")]
     public string UsedProtocol { get; set; } = string.Empty;
 
     /// <summary>
-    /// True if status code indicates success (2xx range).
+    /// True for 2xx status codes.
     /// </summary>
     public bool IsSuccessStatus => (int)Status is >= 200 and < 300;
 
     /// <summary>
-    /// Get first value of a header. Returns null if header doesn't exist.
+    /// Gets first header value or null if not found.
     /// </summary>
-    /// <param name="name">Header name (case-insensitive usually)</param>
+    /// <param name="name">Header name</param>
     /// <returns>First header value or null</returns>
     public string? GetHeader(string name)
     {
@@ -77,19 +77,19 @@ public class HttpResponse
     }
 
     /// <summary>
-    /// Get all values for a header. Some headers can appear multiple times.
+    /// Gets all values for a header.
     /// </summary>
     /// <param name="name">Header name</param>
-    /// <returns>List of header values (empty if header doesn't exist)</returns>
+    /// <returns>Header values or empty list</returns>
     public List<string> GetHeaderValues(string name)
     {
         return Headers.TryGetValue(name, out var values) ? values : [];
     }
 
     /// <summary>
-    /// Check if response has a specific header.
+    /// Checks if header exists.
     /// </summary>
-    /// <param name="name">Header name to check</param>
+    /// <param name="name">Header name</param>
     /// <returns>True if header exists</returns>
     public bool HasHeader(string name)
     {
@@ -97,19 +97,19 @@ public class HttpResponse
     }
 
     /// <summary>
-    /// Get cookie value by name. Convenient for parsed Set-Cookie headers.
+    /// Gets cookie value by name.
     /// </summary>
     /// <param name="name">Cookie name</param>
-    /// <returns>Cookie value or null if not found</returns>
+    /// <returns>Cookie value or null</returns>
     public string? GetCookie(string name)
     {
         return Cookies.TryGetValue(name, out var value) ? value : null;
     }
 
     /// <summary>
-    /// Check if response has a specific cookie.
+    /// Checks if cookie exists.
     /// </summary>
-    /// <param name="name">Cookie name to check</param>
+    /// <param name="name">Cookie name</param>
     /// <returns>True if cookie exists</returns>
     public bool HasCookie(string name)
     {
@@ -117,12 +117,12 @@ public class HttpResponse
     }
 
     /// <summary>
-    /// Content-Type header value. Null if not present.
+    /// Content-Type header value.
     /// </summary>
     public string? ContentType => GetHeader("Content-Type");
 
     /// <summary>
-    /// Content length from header. Returns -1 if header is missing or invalid.
+    /// Content length from header. Returns -1 if missing or invalid.
     /// </summary>
     public long ContentLength
     {

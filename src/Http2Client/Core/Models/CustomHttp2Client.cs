@@ -4,8 +4,7 @@ using System.Text.Json.Serialization;
 namespace Http2Client.Core.Models;
 
 /// <summary>
-/// Custom TLS fingerprint configuration. For advanced users who want full control.
-/// Most people should just use the predefined TlsClientIdentifier values instead.
+/// Custom TLS fingerprint config. For advanced users - most should use browser presets.
 /// </summary>
 /// <remarks>
 /// Corresponds to the Go <c>CustomTlsClient</c> struct:
@@ -14,103 +13,103 @@ namespace Http2Client.Core.Models;
 public class CustomHttp2Client
 {
     /// <summary>
-    /// HTTP/2 settings to advertise (e.g., SETTINGS_MAX_CONCURRENT_STREAMS).
+    /// HTTP/2 settings to advertise.
     /// </summary>
     [JsonPropertyName("h2Settings")]
     public Dictionary<string, uint> Http2Settings { get; set; } = [];
 
     /// <summary>
-    /// HTTP/2 header priority configuration.
+    /// HTTP/2 header priority config.
     /// </summary>
     [JsonPropertyName("headerPriority")]
     public PriorityParam? HeaderPriority { get; set; }
 
     /// <summary>
-    /// Certificate compression algorithms to support (e.g., "brotli").
+    /// Certificate compression algorithms.
     /// </summary>
     [JsonPropertyName("certCompressionAlgos")]
     public List<string> CertificateCompressionAlgorithms { get; set; } = [];
 
     /// <summary>
-    /// JA3 fingerprint string. Leave empty to auto-generate.
+    /// JA3 fingerprint string. Auto-generated if empty.
     /// </summary>
     [JsonPropertyName("ja3String")]
     public string Ja3Fingerprint { get; set; } = string.Empty;
 
     /// <summary>
-    /// Order to send HTTP/2 settings in. Affects fingerprint realism.
+    /// HTTP/2 settings order. Affects fingerprint.
     /// </summary>
     [JsonPropertyName("h2SettingsOrder")]
     public List<string> Http2SettingsOrder { get; set; } = [];
 
     /// <summary>
-    /// Elliptic curves to advertise for key exchange (e.g., "X25519", "P-256").
+    /// Elliptic curves for key exchange.
     /// </summary>
     [JsonPropertyName("keyShareCurves")]
     public List<string> KeyShareCurves { get; set; } = [];
 
     /// <summary>
-    /// ALPN protocols to advertise (e.g., "h2", "http/1.1").
+    /// ALPN protocols to advertise.
     /// </summary>
     [JsonPropertyName("alpnProtocols")]
     public List<string> AlpnProtocols { get; set; } = [];
 
     /// <summary>
-    /// ALPS protocols for application layer settings.
+    /// ALPS protocols for app layer settings.
     /// </summary>
     [JsonPropertyName("alpsProtocols")]
     public List<string> AlpsProtocols { get; set; } = [];
 
     /// <summary>
-    /// ECH candidate payloads (as uint16 values).
+    /// ECH candidate payloads.
     /// </summary>
     [JsonPropertyName("ECHCandidatePayloads")]
     public List<ushort> EchCandidatePayloads { get; set; } = [];
 
     /// <summary>
-    /// ECH cipher suites for encrypted client hello.
+    /// ECH cipher suites.
     /// </summary>
     [JsonPropertyName("ECHCandidateCipherSuites")]
     public List<CandidateCipherSuite> EchCandidateCipherSuites { get; set; } = [];
 
     /// <summary>
-    /// HTTP/2 priority frames to send for stream prioritization.
+    /// HTTP/2 priority frames for stream prioritization.
     /// </summary>
     [JsonPropertyName("priorityFrames")]
     public List<PriorityFrame> PriorityFrames { get; set; } = [];
 
     /// <summary>
-    /// Order to send HTTP/2 pseudo-headers (e.g., ":method", ":path").
+    /// HTTP/2 pseudo-header order.
     /// </summary>
     [JsonPropertyName("pseudoHeaderOrder")]
     public List<string> PseudoHeaderOrder { get; set; } = [];
 
     /// <summary>
-    /// Delegated credentials algorithms to support.
+    /// Delegated credentials algorithms.
     /// </summary>
     [JsonPropertyName("supportedDelegatedCredentialsAlgorithms")]
     public List<string> SupportedDelegatedCredentialsAlgorithms { get; set; } = [];
 
     /// <summary>
-    /// Signature algorithms to advertise (e.g., "ECDSA", "RSA").
+    /// Signature algorithms to advertise.
     /// </summary>
     [JsonPropertyName("supportedSignatureAlgorithms")]
     public List<string> SupportedSignatureAlgorithms { get; set; } = [];
 
     /// <summary>
-    /// TLS versions to support (e.g., "TLS 1.2", "TLS 1.3").
+    /// TLS versions to support.
     /// </summary>
     [JsonPropertyName("supportedVersions")]
     public List<string> SupportedVersions { get; set; } = [];
 
     /// <summary>
-    /// HTTP/2 connection-level flow control window size.
+    /// HTTP/2 connection flow control window size.
     /// </summary>
     [JsonPropertyName("connectionFlow")]
     public uint ConnectionFlow { get; set; }
 
     /// <summary>
-    /// TLS record size limit (in bytes).
+    /// TLS record size limit in bytes.
     /// </summary>
     [JsonPropertyName("recordSizeLimit")]
     public ushort RecordSizeLimit { get; set; }

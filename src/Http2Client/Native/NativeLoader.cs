@@ -6,19 +6,17 @@ using System.Runtime.InteropServices;
 namespace Http2Client.Native;
 
 /// <summary>
-/// Cross-platform native library loader. Handles the messy details of loading .dll/.so/.dylib files
-/// and finding functions inside them. Each OS does this differently, so we wrap it all up here.
+/// Cross-platform native library loader. Handles OS-specific loading of .dll/.so/.dylib files.
 /// </summary>
 internal static class NativeLoader
 {
     /// <summary>
-    /// Tell dlopen to resolve all symbols immediately instead of lazily
+    /// Resolve all symbols immediately.
     /// </summary>
     private const int RTLD_NOW = 2;
 
     /// <summary>
-    /// Load a native library file and get a handle you can use to call functions.
-    /// Throws PlatformNotSupportedException if we don't know how to load libraries on this OS.
+    /// Loads native library and returns handle for function calls.
     /// </summary>
     public static nint LoadLibrary(string path)
     {
@@ -30,10 +28,10 @@ internal static class NativeLoader
     }
 
     /// <summary>
-    /// Find a function inside a loaded library by name. Like GetProcAddress on Windows.
+    /// Finds function in loaded library by name.
     /// </summary>
-    /// <param name="handle">Library handle from LoadLibrary</param>
-    /// <param name="name">Name of the function to find</param>
+    /// <param name="handle">Library handle</param>
+    /// <param name="name">Function name</param>
     public static nint GetProcAddress(nint handle, string name)
     {
         if (PlatformSupport.IsLinux) return Linux.dlsym(handle, name);
@@ -44,9 +42,9 @@ internal static class NativeLoader
     }
 
     /// <summary>
-    /// Unload a library and free its memory. Always call this when you're done.
+    /// Unloads library and frees memory.
     /// </summary>
-    /// <param name="handle">Library handle from LoadLibrary</param>
+    /// <param name="handle">Library handle</param>
     public static bool FreeLibrary(nint handle)
     {
         // Linux and macOS return 0 on success, non-zero on failure
@@ -58,7 +56,7 @@ internal static class NativeLoader
     }
 
     /// <summary>
-    /// Windows native library functions. Good old kernel32.dll doing the heavy lifting.
+    /// Windows native library functions.
     /// </summary>
     private static class Windows
     {
@@ -74,7 +72,7 @@ internal static class NativeLoader
     }
 
     /// <summary>
-    /// Linux dynamic loading functions. Uses libdl which should be available everywhere.
+    /// Linux dynamic loading functions.
     /// </summary>
     private static class Linux
     {
@@ -89,7 +87,7 @@ internal static class NativeLoader
     }
 
     /// <summary>
-    /// macOS dynamic loading. Same as Linux but uses .dylib instead of .so files.
+    /// macOS dynamic loading functions.
     /// </summary>
     private static class MacOS
     {

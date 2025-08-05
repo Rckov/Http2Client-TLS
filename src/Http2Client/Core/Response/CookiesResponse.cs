@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 namespace Http2Client.Core.Response;
 
 /// <summary>
-/// Response from cookie management operations. Contains the cookies from a session.
+/// Response from cookie operations containing session cookies.
 /// </summary>
 /// <remarks>
 /// Corresponds to Go struct <c>CookiesFromSessionOutput</c>:
@@ -15,13 +15,13 @@ namespace Http2Client.Core.Response;
 public class CookiesResponse
 {
     /// <summary>
-    /// Response ID for tracking.
+    /// Response ID.
     /// </summary>
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;
 
     /// <summary>
-    /// List of cookies from the session.
+    /// Cookies from session.
     /// </summary>
     [JsonPropertyName("cookies")]
     public List<ClientCookie> Cookies { get; set; } = [];

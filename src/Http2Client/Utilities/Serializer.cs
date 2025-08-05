@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 namespace Http2Client.Utilities;
 
 /// <summary>
-/// JSON serialization helper with consistent settings across the library.
+/// JSON serialization with consistent settings.
 /// </summary>
 internal static class Serializer
 {
@@ -24,17 +24,17 @@ internal static class Serializer
     };
 
     /// <summary>
-    /// Serialize object to JSON string.
+    /// Serializes object to JSON string.
     /// </summary>
     public static string Serialize<T>(T data) => JsonSerializer.Serialize(data, _options);
 
     /// <summary>
-    /// Serialize object to UTF-8 bytes. Used by native library.
+    /// Serializes object to UTF-8 bytes for native library.
     /// </summary>
     public static byte[] SerializeToBytes<T>(T data) => Encoding.UTF8.GetBytes(Serialize(data));
 
     /// <summary>
-    /// Deserialize JSON string to object.
+    /// Deserializes JSON string to object.
     /// </summary>
     public static T Deserialize<T>(string json)
     {

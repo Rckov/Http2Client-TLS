@@ -7,14 +7,14 @@ using System.Collections.Generic;
 namespace Http2Client.Builders;
 
 /// <summary>
-/// Easy way to build Http2Client instances. Chain methods together and call Build().
+/// Builder for Http2Client instances. Chain methods and call Build().
 /// </summary>
 public class HttpClientBuilder
 {
     private readonly Http2ClientOptions _options = new();
 
     /// <summary>
-    /// Set path to the native library. Usually not needed - we auto-detect it.
+    /// Sets native library path. Auto-detected if not set.
     /// </summary>
     public HttpClientBuilder WithLibraryPath(string libraryPath)
     {
@@ -37,7 +37,7 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Turn on debug logging. Helpful when stuff breaks.
+    /// Enables debug logging.
     /// </summary>
     public HttpClientBuilder WithDebug(bool enable = true)
     {
@@ -46,7 +46,7 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Which browser to pretend to be. Chrome131 is usually safe.
+    /// Sets browser fingerprint to mimic.
     /// </summary>
     public HttpClientBuilder WithBrowserType(BrowserType browserType)
     {
@@ -55,7 +55,7 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Use custom TLS fingerprint instead of built-in browser profiles.
+    /// Uses custom TLS fingerprint instead of browser preset.
     /// </summary>
     public HttpClientBuilder WithCustomHttp2Client(CustomHttp2Client customHttp2Client)
     {
@@ -64,7 +64,7 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Skip SSL checks. Dangerous but sometimes needed for testing.
+    /// Skips SSL certificate validation.
     /// </summary>
     public HttpClientBuilder WithInsecureSkipVerify(bool skip = true)
     {
@@ -73,7 +73,7 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Randomize TLS extensions to look more human. Usually a good idea.
+    /// Randomizes TLS extension order.
     /// </summary>
     public HttpClientBuilder WithRandomTlsExtensions(bool enable = true)
     {
@@ -82,7 +82,7 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Use a proxy. Supports HTTP, HTTPS, and SOCKS5.
+    /// Uses proxy. Supports HTTP, HTTPS, SOCKS5.
     /// </summary>
     public HttpClientBuilder WithProxy(string proxyUrl, bool isRotating = false)
     {
@@ -94,7 +94,7 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Force IPv6-only connections. For specific network setups.
+    /// Disables IPv4 connections.
     /// </summary>
     public HttpClientBuilder DisableIPv4(bool disable = true)
     {
@@ -103,7 +103,7 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Force IPv4-only connections. Sometimes needed for older networks.
+    /// Disables IPv6 connections.
     /// </summary>
     public HttpClientBuilder DisableIPv6(bool disable = true)
     {
@@ -112,7 +112,7 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Auto-follow redirects. Most browsers do this by default.
+    /// Enables automatic redirect following.
     /// </summary>
     public HttpClientBuilder FollowRedirects(bool follow = true)
     {
@@ -121,7 +121,7 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Force HTTP/1.1 instead of HTTP/2. Sometimes needed for compatibility.
+    /// Forces HTTP/1.1 over HTTP/2.
     /// </summary>
     public HttpClientBuilder ForceHttp1(bool force = true)
     {
@@ -130,7 +130,7 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Enable automatic cookie handling. Cookies will be stored and sent automatically.
+    /// Enables automatic cookie handling.
     /// </summary>
     public HttpClientBuilder WithCookies(bool enabled = true)
     {
@@ -142,7 +142,7 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Catch Go panics from the native library. Usually you want this enabled.
+    /// Catches native library panics.
     /// </summary>
     public HttpClientBuilder CatchPanics(bool enable = true)
     {
@@ -151,7 +151,7 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Set the User-Agent header. Pick something that matches your TLS fingerprint.
+    /// Sets User-Agent header.
     /// </summary>
     public HttpClientBuilder WithUserAgent(string userAgent)
     {
@@ -160,7 +160,7 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Set a default header that will be sent with every request.
+    /// Sets default header sent with every request.
     /// </summary>
     public HttpClientBuilder SetHeader(string name, string value)
     {
@@ -170,7 +170,7 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Set multiple default headers at once. Convenient for bulk setup.
+    /// Sets multiple default headers at once.
     /// </summary>
     public HttpClientBuilder WithHeaders(Dictionary<string, string> headers)
     {
@@ -183,7 +183,7 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Build the options object without creating the client yet.
+    /// Builds options without creating client.
     /// </summary>
     public Http2ClientOptions BuildOptions()
     {
@@ -195,7 +195,7 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Check for conflicting settings before building.
+    /// Validates builder for conflicting settings.
     /// </summary>
     private void ValidateBuilder()
     {
@@ -211,7 +211,7 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Build the final Http2Client instance.
+    /// Builds final Http2Client instance.
     /// </summary>
     public Http2Client Build()
     {

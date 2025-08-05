@@ -4,12 +4,12 @@ using System.IO;
 namespace Http2Client.Utilities;
 
 /// <summary>
-/// Helper methods for throwing common exceptions. Keeps validation code clean.
+/// Helper methods for common exception throwing.
 /// </summary>
 internal static class ThrowException
 {
     /// <summary>
-    /// Throw <see cref="ArgumentNullException" /> if value is null.
+    /// Throws ArgumentNullException if value is null.
     /// </summary>
     public static void Null<T>(T value, string paramName = "value")
     {
@@ -20,7 +20,7 @@ internal static class ThrowException
     }
 
     /// <summary>
-    /// Throw <see cref="ArgumentException" /> if string is null or empty.
+    /// Throws ArgumentException if string is null or empty.
     /// </summary>
     public static void NullOrEmpty(string value, string paramName = "value")
     {
@@ -31,7 +31,7 @@ internal static class ThrowException
     }
 
     /// <summary>
-    /// Throw <see cref="FileNotFoundException" /> if file doesn't exist.
+    /// Throws FileNotFoundException if file doesn't exist.
     /// </summary>
     public static void FileNotExists(string filePath, string paramName = "filePath")
     {

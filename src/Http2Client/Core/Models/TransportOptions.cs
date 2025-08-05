@@ -3,8 +3,7 @@
 namespace Http2Client.Core.Models;
 
 /// <summary>
-/// Low-level HTTP transport options. For fine-tuning connection behavior.
-/// Most users won't need to touch these.
+/// Low-level transport options for connection tuning.
 /// </summary>
 /// <remarks>
 /// Corresponds to the Go <c>TransportOptions</c> struct:
@@ -13,55 +12,55 @@ namespace Http2Client.Core.Models;
 public class TransportOptions
 {
     /// <summary>
-    /// How long to keep idle connections open (in milliseconds). Zero means no limit.
+    /// Idle connection timeout in milliseconds.
     /// </summary>
     [JsonPropertyName("idleConnTimeout")]
     public long? IdleConnTimeout { get; set; }
 
     /// <summary>
-    /// Maximum number of idle connections to keep.
+    /// Max idle connections.
     /// </summary>
     [JsonPropertyName("maxIdleConns")]
     public int MaxIdleConns { get; set; }
 
     /// <summary>
-    /// Maximum idle connections per host.
+    /// Max idle connections per host.
     /// </summary>
     [JsonPropertyName("maxIdleConnsPerHost")]
     public int MaxIdleConnsPerHost { get; set; }
 
     /// <summary>
-    /// Maximum total connections per host.
+    /// Max total connections per host.
     /// </summary>
     [JsonPropertyName("maxConnsPerHost")]
     public int MaxConnsPerHost { get; set; }
 
     /// <summary>
-    /// Maximum bytes to read from response headers.
+    /// Max response header bytes.
     /// </summary>
     [JsonPropertyName("maxResponseHeaderBytes")]
     public long MaxResponseHeaderBytes { get; set; }
 
     /// <summary>
-    /// Size of write buffer for connections.
+    /// Write buffer size.
     /// </summary>
     [JsonPropertyName("writeBufferSize")]
     public int WriteBufferSize { get; set; }
 
     /// <summary>
-    /// Size of read buffer for connections.
+    /// Read buffer size.
     /// </summary>
     [JsonPropertyName("readBufferSize")]
     public int ReadBufferSize { get; set; }
 
     /// <summary>
-    /// Disable HTTP keep-alive connections.
+    /// Disable keep-alive connections.
     /// </summary>
     [JsonPropertyName("disableKeepAlives")]
     public bool DisableKeepAlives { get; set; }
 
     /// <summary>
-    /// Disable automatic response compression.
+    /// Disable response compression.
     /// </summary>
     [JsonPropertyName("disableCompression")]
     public bool DisableCompression { get; set; }

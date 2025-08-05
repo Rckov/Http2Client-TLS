@@ -8,12 +8,12 @@ using System.Text.Json.Serialization;
 namespace Http2Client.Core.Converters;
 
 /// <summary>
-/// JSON converter for <see cref="BrowserType"/> enum. Converts to/from string values.
+/// JSON converter for BrowserType enum.
 /// </summary>
 internal class JsonBrowserTypeConverter : JsonConverter<BrowserType?>
 {
     /// <summary>
-    /// Read <see cref="BrowserType"/> from JSON string.
+    /// Reads BrowserType from JSON.
     /// </summary>
     public override BrowserType? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
@@ -29,7 +29,7 @@ internal class JsonBrowserTypeConverter : JsonConverter<BrowserType?>
     }
 
     /// <summary>
-    /// Write <see cref="BrowserType"/> to JSON string.
+    /// Writes BrowserType to JSON.
     /// </summary>
     public override void Write(Utf8JsonWriter writer, BrowserType? value, JsonSerializerOptions options)
     {

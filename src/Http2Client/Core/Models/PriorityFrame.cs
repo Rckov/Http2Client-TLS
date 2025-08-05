@@ -3,7 +3,7 @@
 namespace Http2Client.Core.Models;
 
 /// <summary>
-/// HTTP/2 priority frame configuration. Used for advanced TLS fingerprinting.
+/// HTTP/2 priority frame for advanced TLS fingerprinting.
 /// </summary>
 /// <remarks>
 /// Corresponds to the Go <c>PriorityFrames</c> struct:
@@ -12,37 +12,37 @@ namespace Http2Client.Core.Models;
 public class PriorityFrame
 {
     /// <summary>
-    /// Priority parameters for this frame.
+    /// Priority parameters.
     /// </summary>
     [JsonPropertyName("priorityParam")]
     public PriorityParam PriorityParam { get; set; } = new();
 
     /// <summary>
-    /// HTTP/2 stream ID this priority applies to.
+    /// Stream ID for this priority.
     /// </summary>
     [JsonPropertyName("streamID")]
     public uint StreamID { get; set; }
 }
 
 /// <summary>
-/// HTTP/2 priority parameters. Controls stream priority and dependencies.
+/// HTTP/2 priority parameters for stream dependencies.
 /// </summary>
 public class PriorityParam
 {
     /// <summary>
-    /// Stream ID this stream depends on.
+    /// Stream dependency ID.
     /// </summary>
     [JsonPropertyName("streamDep")]
     public uint StreamDep { get; set; }
 
     /// <summary>
-    /// Whether this stream has exclusive dependency.
+    /// Exclusive dependency flag.
     /// </summary>
     [JsonPropertyName("exclusive")]
     public bool Exclusive { get; set; }
 
     /// <summary>
-    /// Priority weight (1-256). Higher means more important.
+    /// Priority weight (1-256). Higher is more important.
     /// </summary>
     [JsonPropertyName("weight")]
     public byte Weight { get; set; }

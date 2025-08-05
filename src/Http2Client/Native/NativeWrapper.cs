@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace Http2Client.Native;
 
 /// <summary>
-/// Wrapper around the native Go TLS library
+/// Wrapper for native Go TLS library.
 /// </summary>
 internal class NativeWrapper : IDisposable
 {
@@ -37,7 +37,7 @@ internal class NativeWrapper : IDisposable
     private readonly DestroyAllDelegate _destroyAllDelegate;
 
     /// <summary>
-    /// Create wrapper from an already loaded library. Don't call this directly - use Load() instead.
+    /// Creates wrapper from loaded library. Use Load() instead.
     /// </summary>
     public NativeWrapper(nint libraryHandle)
     {
@@ -53,8 +53,7 @@ internal class NativeWrapper : IDisposable
     }
 
     /// <summary>
-    /// Load the native TLS library and create a wrapper. This is what you should call.
-    /// If anything goes wrong, we'll clean up and throw an exception.
+    /// Loads native library and creates wrapper. Cleans up on failure.
     /// </summary>
     public static NativeWrapper Load(string path)
     {
@@ -74,7 +73,7 @@ internal class NativeWrapper : IDisposable
     }
 
     /// <summary>
-    /// Send an HTTP request through the native library.
+    /// Sends HTTP request through native library.
     /// </summary>
     public string Request(byte[] payload)
     {
@@ -83,7 +82,7 @@ internal class NativeWrapper : IDisposable
     }
 
     /// <summary>
-    /// Get all cookies stored in a session for a specific URL. Useful for debugging.
+    /// Gets cookies from session for URL.
     /// </summary>
     public string GetCookiesFromSession(byte[] payload)
     {
@@ -92,7 +91,7 @@ internal class NativeWrapper : IDisposable
     }
 
     /// <summary>
-    /// Add cookies to a session so they'll be sent automatically on future requests.
+    /// Adds cookies to session for automatic sending.
     /// </summary>
     public string AddCookiesToSession(byte[] payload)
     {
@@ -101,7 +100,7 @@ internal class NativeWrapper : IDisposable
     }
 
     /// <summary>
-    /// Clean up a specific session and free its memory in the native library.
+    /// Destroys session and frees memory.
     /// </summary>
     public string DestroySession(byte[] payload)
     {
@@ -110,8 +109,7 @@ internal class NativeWrapper : IDisposable
     }
 
     /// <summary>
-    /// Nuclear option: destroy ALL sessions in the native library.
-    /// This will break other Http2Client instances!
+    /// Destroys ALL sessions. Breaks other client instances!
     /// </summary>
     public string DestroyAllSessions()
     {
@@ -119,8 +117,7 @@ internal class NativeWrapper : IDisposable
     }
 
     /// <summary>
-    /// Tell the native library to free memory for a specific response.
-    /// Called automatically after each request.
+    /// Frees response memory. Called automatically.
     /// </summary>
     public void FreeMemory(string responseId)
     {
@@ -129,7 +126,7 @@ internal class NativeWrapper : IDisposable
     }
 
     /// <summary>
-    /// Find a function in the loaded library and turn it into a C# delegate we can call.
+    /// Finds function in library and creates delegate.
     /// </summary>
     private T GetDelegate<T>(string functionName)
     {
@@ -144,7 +141,7 @@ internal class NativeWrapper : IDisposable
     }
 
     /// <summary>
-    /// Call a native function and convert its result from a C string to a C# string.
+    /// Calls native function and converts result to string.
     /// </summary>
     private static string ExecuteFunction(Func<nint> nativeFunction)
     {

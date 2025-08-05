@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 namespace Http2Client.Core.Request;
 
 /// <summary>
-/// Request to add cookies to a session for a specific URL.
+/// Request to add cookies to session for URL.
 /// </summary>
 /// <remarks>
 /// Corresponds to the Go <c>AddCookiesToSessionInput</c> struct:
@@ -16,26 +16,26 @@ namespace Http2Client.Core.Request;
 public class AddCookiesRequest
 {
     /// <summary>
-    /// Session ID to add cookies to.
+    /// Target session ID.
     /// </summary>
     [JsonPropertyName("sessionId")]
     public Guid SessionId { get; set; }
 
     /// <summary>
-    /// URL the cookies are for (sets domain).
+    /// URL for cookie domain.
     /// </summary>
     [JsonPropertyName("url")]
     public string Url { get; set; } = string.Empty;
 
     /// <summary>
-    /// List of cookies to add to the session.
+    /// Cookies to add.
     /// </summary>
     [JsonPropertyName("cookies")]
     public List<ClientCookie> Cookies { get; set; } = [];
 }
 
 /// <summary>
-/// Request to get cookies from a session for a specific URL.
+/// Request to get cookies from session for URL.
 /// </summary>
 /// <remarks>
 /// Corresponds to the Go <c>GetCookiesFromSessionInput</c> struct:
@@ -44,13 +44,13 @@ public class AddCookiesRequest
 public class GetCookiesRequest
 {
     /// <summary>
-    /// Session ID to get cookies from.
+    /// Source session ID.
     /// </summary>
     [JsonPropertyName("sessionId")]
     public Guid SessionId { get; set; }
 
     /// <summary>
-    /// URL to get cookies for (domain matching).
+    /// URL for domain matching.
     /// </summary>
     [JsonPropertyName("url")]
     public string Url { get; set; } = string.Empty;

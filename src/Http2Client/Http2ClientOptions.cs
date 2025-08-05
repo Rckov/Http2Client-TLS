@@ -9,88 +9,87 @@ using System.IO;
 namespace Http2Client;
 
 /// <summary>
-/// All the settings for your Http2Client. Usually built with HttpClientBuilder,
-/// but you can create this directly if you want full control.
+/// Configuration for Http2Client. Use HttpClientBuilder for easy setup.
 /// </summary>
 public class Http2ClientOptions
 {
     /// <summary>
-    /// Unique ID for this client's session. Gets auto-generated, but you can set your own.
+    /// Session ID for this client. Auto-generated if not set.
     /// </summary>
     public Guid SessionID { get; set; } = Guid.NewGuid();
 
     /// <summary>
-    /// Where to find the native TLS library. We'll try to auto-detect if you don't set this.
+    /// Path to native TLS library. Auto-detected if not specified.
     /// </summary>
     public string LibraryPath { get; set; } = GetDefaultLibraryPath();
 
     /// <summary>
-    /// Which browser to pretend to be. Chrome131 is a good default that works most places.
+    /// Browser fingerprint to mimic. Chrome131 works well for most sites.
     /// </summary>
     public BrowserType BrowserType { get; set; } = BrowserType.Chrome131;
 
     /// <summary>
-    /// Roll your own TLS fingerprint instead of using a preset. Advanced users only.
+    /// Custom TLS fingerprint instead of browser preset. For advanced use.
     /// </summary>
     public CustomHttp2Client? CustomHttp2Client { get; set; }
 
     /// <summary>
-    /// Skip SSL certificate checks. Dangerous but sometimes needed for testing or weird corporate setups.
+    /// Skip SSL certificate validation. Use with caution.
     /// </summary>
     public bool InsecureSkipVerify { get; set; }
 
     /// <summary>
-    /// Proxy server to route requests through. Format: "http://proxy:port" or "socks5://proxy:port"
+    /// Proxy URL. Supports HTTP, HTTPS, and SOCKS5.
     /// </summary>
     public string? ProxyUrl { get; set; }
 
     /// <summary>
-    /// Set to true if your proxy changes IP addresses automatically. Helps with connection pooling.
+    /// True if proxy rotates IPs automatically.
     /// </summary>
     public bool IsRotatingProxy { get; set; }
 
     /// <summary>
-    /// Block IPv4 connections. Only useful if you want IPv6-only for some reason.
+    /// Disable IPv4 connections.
     /// </summary>
     public bool DisableIPv4 { get; set; }
 
     /// <summary>
-    /// Block IPv6 connections. Sometimes needed for networks that don't support it properly.
+    /// Disable IPv6 connections.
     /// </summary>
     public bool DisableIPv6 { get; set; }
 
     /// <summary>
-    /// How long to wait for requests before giving up. 60 seconds is usually plenty.
+    /// Request timeout. Default is 60 seconds.
     /// </summary>
     public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(60);
 
     /// <summary>
-    /// Automatically follow 3xx redirects. Disabled by default so you have control.
+    /// Follow redirects automatically. Disabled by default.
     /// </summary>
     public bool FollowRedirects { get; set; } = false;
 
     /// <summary>
-    /// Force HTTP/1.1 even if the server supports HTTP/2. Useful for debugging.
+    /// Force HTTP/1.1 instead of HTTP/2.
     /// </summary>
     public bool ForceHttp1 { get; set; } = false;
 
     /// <summary>
-    /// Let the client handle cookies automatically. They'll be saved and sent back on future requests.
+    /// Enable automatic cookie handling.
     /// </summary>
     public bool WithDefaultCookieJar { get; set; } = false;
 
     /// <summary>
-    /// Turn off all cookie handling. Cookies won't be saved or sent automatically.
+    /// Disable all cookie handling.
     /// </summary>
     public bool WithoutCookieJar { get; set; } = false;
 
     /// <summary>
-    /// Headers to include with every request. Individual requests can override these.
+    /// Default headers sent with every request.
     /// </summary>
     public Dictionary<string, List<string>> DefaultHeaders { get; set; } = [];
 
     /// <summary>
-    /// Shortcut to set or retrieve the User-Agent header.
+    /// User-Agent header value.
     /// </summary>
     public string? UserAgent
     {
@@ -105,23 +104,22 @@ public class Http2ClientOptions
     }
 
     /// <summary>
-    /// Enable verbose debug logging from the native library.
+    /// Enable debug logging.
     /// </summary>
     public bool WithDebug { get; set; }
 
     /// <summary>
-    /// Catch panics from native Go code and avoid crashing the app. Enabled by default.
+    /// Catch native library panics. Enabled by default.
     /// </summary>
     public bool CatchPanics { get; set; } = true;
 
     /// <summary>
-    /// Randomize TLS extension order. Helps mimic real browsers more closely.
+    /// Randomize TLS extension order for better browser mimicking.
     /// </summary>
     public bool WithRandomTlsExtensionOrder { get; set; }
 
     /// <summary>
-    /// Validates current configuration and throws if something is misconfigured.
-    /// Called automatically during client creation.
+    /// Validates configuration. Called automatically when creating client.
     /// </summary>
     public void Validate()
     {
@@ -147,7 +145,7 @@ public class Http2ClientOptions
     }
 
     /// <summary>
-    /// Creates a full deep copy of these options. Useful when you want to create multiple clients with similar settings.
+    /// Creates a deep copy of these options.
     /// </summary>
     public Http2ClientOptions Clone()
     {
@@ -182,7 +180,7 @@ public class Http2ClientOptions
     }
 
     /// <summary>
-    /// Determines the default path to the native TLS library based on the current platform.
+    /// Gets default native library path for current platform.
     /// </summary>
     private static string GetDefaultLibraryPath()
     {

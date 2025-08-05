@@ -3,8 +3,7 @@
 namespace Http2Client.Core.Models;
 
 /// <summary>
-/// Encrypted Client Hello (ECH) cipher suite configuration.
-/// Part of advanced TLS fingerprinting. Most users won't need this.
+/// ECH cipher suite config for advanced TLS fingerprinting.
 /// </summary>
 /// <remarks>
 /// Corresponds to the Go <c>CandidateCipherSuite</c> struct:
@@ -13,13 +12,13 @@ namespace Http2Client.Core.Models;
 public class CandidateCipherSuite
 {
     /// <summary>
-    /// Key Derivation Function identifier.
+    /// Key Derivation Function ID.
     /// </summary>
     [JsonPropertyName("kdfId")]
     public string KdfId { get; set; } = string.Empty;
 
     /// <summary>
-    /// Authenticated Encryption with Associated Data identifier.
+    /// AEAD cipher ID.
     /// </summary>
     [JsonPropertyName("aeadId")]
     public string AeadId { get; set; } = string.Empty;

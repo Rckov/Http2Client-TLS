@@ -3,7 +3,7 @@
 namespace Http2Client.Core.Models;
 
 /// <summary>
-/// HTTP cookie with all the standard attributes. Works like browser cookies.
+/// HTTP cookie with standard attributes.
 /// </summary>
 /// <remarks>
 /// Corresponds to the Go <c>Cookie</c> struct in the original library:
@@ -12,7 +12,7 @@ namespace Http2Client.Core.Models;
 public class ClientCookie
 {
     /// <summary>
-    /// Cookie name like "sessionid".
+    /// Cookie name.
     /// </summary>
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
@@ -24,43 +24,43 @@ public class ClientCookie
     public string Value { get; set; } = string.Empty;
 
     /// <summary>
-    /// Domain the cookie is valid for. Like ".example.com".
+    /// Domain the cookie is valid for.
     /// </summary>
     [JsonPropertyName("domain")]
     public string Domain { get; set; } = string.Empty;
 
     /// <summary>
-    /// Path the cookie is valid for. Usually "/".
+    /// Path the cookie is valid for.
     /// </summary>
     [JsonPropertyName("path")]
     public string Path { get; set; } = string.Empty;
 
     /// <summary>
-    /// When cookie expires (Unix timestamp). 0 means session cookie.
+    /// Expiration time (Unix timestamp). 0 for session cookie.
     /// </summary>
     [JsonPropertyName("expires")]
     public long Expires { get; set; } = 0;
 
     /// <summary>
-    /// Max age in seconds. Alternative to Expires.
+    /// Max age in seconds.
     /// </summary>
     [JsonPropertyName("maxAge")]
     public long MaxAge { get; set; } = 0;
 
     /// <summary>
-    /// True if cookie should only be sent over HTTPS.
+    /// Send only over HTTPS.
     /// </summary>
     [JsonPropertyName("secure")]
     public bool Secure { get; set; } = false;
 
     /// <summary>
-    /// True if cookie is inaccessible to JavaScript (HttpOnly flag).
+    /// Inaccessible to JavaScript (HttpOnly).
     /// </summary>
     [JsonPropertyName("httpOnly")]
     public bool HttpOnly { get; set; } = false;
 
     /// <summary>
-    /// Create cookie with name and value. Other fields can be set later.
+    /// Creates cookie with name and value.
     /// </summary>
     /// <param name="name">Cookie name</param>
     /// <param name="value">Cookie value</param>
@@ -71,7 +71,7 @@ public class ClientCookie
     }
 
     /// <summary>
-    /// Default constructor for deserialization.
+    /// Default constructor.
     /// </summary>
     public ClientCookie()
     { }
