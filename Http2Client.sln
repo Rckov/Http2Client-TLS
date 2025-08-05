@@ -9,11 +9,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{4A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F245E407-5E9D-427E-98C8-D79116882421}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Http2Client.Console", "examples\Http2Client.Console\Http2Client.Console.csproj", "{16B97360-39EA-4A84-B3A0-D028DB8C8635}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Http2Client.Console", "examples\Http2Client.Console.csproj", "{16B97360-39EA-4A84-B3A0-D028DB8C8635}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Http2Client", "src\Http2Client\Http2Client.csproj", "{5D33478C-EF54-4CFE-BC78-7CB6D40D0DCB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Http2Client", "src\Http2Client.csproj", "{5D33478C-EF54-4CFE-BC78-7CB6D40D0DCB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Http2Client.Test", "tests\Http2Client.Test\Http2Client.Test.csproj", "{00D83329-045D-4431-819E-C3A45034A4EF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Http2Client.Test", "tests\Http2Client.Test.csproj", "{00D83329-045D-4431-819E-C3A45034A4EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

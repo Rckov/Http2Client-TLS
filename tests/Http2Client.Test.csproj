@@ -19,11 +19,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Xunit" />
+    <ProjectReference Include="..\src\Http2Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Http2Client\Http2Client.csproj" />
+    <Using Include="Xunit" />
   </ItemGroup>
 
 </Project>

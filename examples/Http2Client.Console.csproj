@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Http2Client\Http2Client.csproj" />
+    <ProjectReference Include="..\src\Http2Client.csproj" />
   </ItemGroup>
 
 </Project>
