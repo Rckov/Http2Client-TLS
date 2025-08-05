@@ -11,24 +11,24 @@ namespace Http2Client.Native;
 internal class NativeWrapper : IDisposable
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate nint RequestDelegate(byte[] payload);
+    private delegate IntPtr RequestDelegate(byte[] payload);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate void FreeMemoryDelegate(string sessionID);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate nint GetCookiesFromSessionDelegate(byte[] payload);
+    private delegate IntPtr GetCookiesFromSessionDelegate(byte[] payload);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate nint AddCookiesToSessionDelegate(byte[] payload);
+    private delegate IntPtr AddCookiesToSessionDelegate(byte[] payload);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate nint DestroySessionDelegate(byte[] payload);
+    private delegate IntPtr DestroySessionDelegate(byte[] payload);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate nint DestroyAllDelegate();
+    private delegate IntPtr DestroyAllDelegate();
 
-    private readonly nint _libraryHandle;
+    private readonly IntPtr _libraryHandle;
     private readonly RequestDelegate _requestDelegate;
     private readonly FreeMemoryDelegate _freeMemoryDelegate;
     private readonly GetCookiesFromSessionDelegate _getCookiesDelegate;
@@ -130,7 +130,7 @@ internal class NativeWrapper : IDisposable
     /// </summary>
     private T GetDelegate<T>(string functionName)
     {
-        nint functionPtr = NativeLoader.GetProcAddress(_libraryHandle, functionName);
+        var functionPtr = NativeLoader.GetProcAddress(_libraryHandle, functionName);
 
         if (functionPtr == IntPtr.Zero)
         {
