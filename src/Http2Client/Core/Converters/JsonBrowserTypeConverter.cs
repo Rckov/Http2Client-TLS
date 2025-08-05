@@ -10,19 +10,19 @@ namespace Http2Client.Core.Converters;
 /// <summary>
 /// JSON converter for BrowserType enum.
 /// </summary>
-internal class JsonBrowserTypeConverter : JsonConverter<BrowserType?>
+internal class JsonBrowserTypeConverter : JsonConverter<BrowserType>
 {
     /// <summary>
     /// Reads BrowserType from JSON.
     /// </summary>
-    public override BrowserType? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override BrowserType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         return reader.TokenType switch
         {
-            JsonTokenType.Null => null,
+            JsonTokenType.Null => default,
             JsonTokenType.String => string.IsNullOrEmpty(reader.GetString())
-                ? null
-                : BrowserTypeExtension.FromString(reader.GetString()!),
+                ? default
+                : BrowserTypeExtension.FromString(reader.GetString()),
 
             _ => throw new JsonException($"Cannot convert {reader.TokenType} to TlsClientIdentifier")
         };
@@ -31,11 +31,11 @@ internal class JsonBrowserTypeConverter : JsonConverter<BrowserType?>
     /// <summary>
     /// Writes BrowserType to JSON.
     /// </summary>
-    public override void Write(Utf8JsonWriter writer, BrowserType? value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, BrowserType value, JsonSerializerOptions options)
     {
-        if (value.HasValue)
+        if (value != default)
         {
-            writer.WriteStringValue(value.Value.GetValue());
+            writer.WriteStringValue(value.GetValue());
         }
         else
         {

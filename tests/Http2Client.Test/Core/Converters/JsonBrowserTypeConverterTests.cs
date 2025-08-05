@@ -23,7 +23,7 @@ public class JsonBrowserTypeConverterTests
     [Fact]
     public void Deserialize_ValidString_ReturnsCorrectEnum()
     {
-        const string json = "\"browserType\":\"chrome_131\"";
+        const string json = "\"chrome_131\"";
 
         var result = Serializer.Deserialize<BrowserType>(json);
 
@@ -37,7 +37,7 @@ public class JsonBrowserTypeConverterTests
 
         var action = () => Serializer.Deserialize<BrowserType>(json);
 
-        action.Should().Throw<JsonException>();
+        action.Should().Throw<ArgumentException>();
     }
 
     [Fact]

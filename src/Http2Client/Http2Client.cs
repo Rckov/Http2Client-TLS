@@ -192,7 +192,6 @@ public sealed class Http2Client : IDisposable
 
         // Fill in missing values from client defaults (null coalescing is your friend)
         req.SessionId ??= _options.SessionID;
-        req.BrowserType ??= _options.BrowserType;
         req.CustomHttp2Client ??= _options.CustomHttp2Client;
         req.ProxyUrl ??= _options.ProxyUrl;
         req.IsRotatingProxy ??= _options.IsRotatingProxy;
@@ -203,6 +202,11 @@ public sealed class Http2Client : IDisposable
         req.WithDefaultCookieJar ??= _options.WithDefaultCookieJar;
         req.WithoutCookieJar ??= _options.WithoutCookieJar;
         req.FollowRedirects ??= _options.FollowRedirects;
+
+        if (req.BrowserType != default)
+        {
+            req.BrowserType = _options.BrowserType;
+        }
 
         // OR logic - either can force HTTP/1
         req.ForceHttp1 = request.ForceHttp1 || _options.ForceHttp1;
@@ -232,7 +236,7 @@ public sealed class Http2Client : IDisposable
         // Custom TLS client and browser type are mutually exclusive
         if (req.CustomHttp2Client != null)
         {
-            req.BrowserType = null;
+            req.BrowserType = default;
         }
 
         return req;

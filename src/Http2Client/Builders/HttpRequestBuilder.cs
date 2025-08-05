@@ -43,8 +43,7 @@ public class HttpRequestBuilder
     }
 
     /// <summary>
-    /// Sends a raw string as the request body.
-    /// You’ll need to set Content-Type yourself if required.
+    /// Sends a raw string as the request body. You’ll need to set Content-Type yourself if required.
     /// </summary>
     public HttpRequestBuilder WithBody(string body)
     {
