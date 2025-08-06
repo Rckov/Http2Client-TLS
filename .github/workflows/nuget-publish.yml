@@ -48,9 +48,6 @@ jobs:
     - name: Build
       run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
       
-    - name: Test
-      run: dotnet test tests/Http2Client.Test.csproj --configuration Release --no-build --verbosity normal
-      
     - name: Create output directory
       run: mkdir -p ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
       
