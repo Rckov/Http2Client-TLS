@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;x64</Platforms>
     <PackageId>Http2Client</PackageId>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Authors>Rckov</Authors>
     <Company>Rckov</Company>
     <Product>Http2Client</Product>
@@ -15,7 +15,7 @@
     <PackageProjectUrl>https://github.com/Rckov/Http2Client-TLS</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Rckov/Http2Client-TLS</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <IncludeSymbols>true</IncludeSymbols>
