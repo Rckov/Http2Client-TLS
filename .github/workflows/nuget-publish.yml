@@ -1,0 +1,67 @@
+name: Publish NuGet Package
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Package version'
+        required: true
+        default: '1.0.0'
+
+env:
+  PROJECT_PATH: src/Http2Client.csproj
+  PACKAGE_OUTPUT_DIRECTORY: ${{ github.workspace }}/output
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: |
+          5.0.x
+          6.0.x
+          8.0.x
+          9.0.x
+          
+    - name: Set version from input
+      if: github.event_name == 'workflow_dispatch'
+      run: |
+        sed -i 's/<Version>.*<\/Version>/<Version>${{ github.event.inputs.version }}<\/Version>/' ${{ env.PROJECT_PATH }}
+        
+    - name: Set version from tag
+      if: github.event_name == 'release'
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/v}
+        sed -i "s/<Version>.*<\/Version>/<Version>$VERSION<\/Version>/" ${{ env.PROJECT_PATH }}
+        
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.PROJECT_PATH }}
+      
+    - name: Build
+      run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
+      
+    - name: Test
+      run: dotnet test tests/Http2Client.Test.csproj --configuration Release --no-build --verbosity normal
+      
+    - name: Create output directory
+      run: mkdir -p ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
+      
+    - name: Pack
+      run: dotnet pack ${{ env.PROJECT_PATH }} --configuration Release --no-build --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
+      
+    - name: Publish to NuGet.org
+      run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-packages
+        path: ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg

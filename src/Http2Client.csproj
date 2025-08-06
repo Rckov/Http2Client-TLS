@@ -1,10 +1,25 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net5.0;net6.0;net8.0;net9.0</TargetFrameworks>
     <LangVersion>Latest</LangVersion>
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;x64</Platforms>
+    <PackageId>Http2Client</PackageId>
+    <Version>1.0.1</Version>
+    <Authors>Rckov</Authors>
+    <Company>Rckov</Company>
+    <Product>Http2Client</Product>
+    <Description>HTTP/2 client with TLS fingerprinting capabilities. Fork of TlsClient.NET with redesigned architecture for .NET applications.</Description>
+    <PackageTags>http2;tls;fingerprinting;browser;client;proxy;cookies</PackageTags>
+    <PackageProjectUrl>https://github.com/Rckov/Http2Client-TLS</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Rckov/Http2Client-TLS</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
