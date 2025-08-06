@@ -6,8 +6,6 @@
 
 Http2Client is a fork of [TlsClient.NET](https://github.com/ErenKrt/TlsClient.NET), providing customizable HTTP/2 clients with TLS fingerprinting capabilities. Based on [bogdanfinn/tls-client](https://github.com/bogdanfinn/tls-client/), it allows you to mimic specific browser fingerprints and control detailed aspects of TLS behavior in your .NET applications.
 
->**Note: The licensing status of the original TlsClient.NET repository is currently unclear. This fork does not claim ownership of the original code. Use it responsibly, and refer to the original projects for context and licensing information.**
-
 ## Installation
 
 ```bash
@@ -277,4 +275,4 @@ Http2Client supports multiple .NET versions:
 
 ## License
 
-This project is a fork of [TlsClient.NET](https://github.com/ErenKrt/TlsClient.NET). The original implementation is based on [bogdanfinn/tls-client](https://github.com/bogdanfinn/tls-client).
+Licensed under [MIT](LICENSE). [Report an Issue](https://github.com/Rckov/Http2Client-TLS/issues)
