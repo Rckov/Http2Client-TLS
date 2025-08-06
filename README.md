@@ -1,8 +1,12 @@
+[![Target Frameworks](https://img.shields.io/badge/Target%20Frameworks-netstandard2.0%20%7C%20net5.0%20%7C%20net6.0%20%7C%20net8.0%20%7C%20net9.0-512BD4)]()
+[![Build and Release](https://github.com/Rckov/Http2Client-TLS/actions/workflows/release.yml/badge.svg)](https://github.com/Rckov/Http2Client-TLS/actions/workflows/release.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/Rckov/Http2Client-TLS)](https://github.com/Rckov/Http2Client-TLS/releases/latest)
+
 # Http2Client
 
-`Http2Client` is a fork of [TlsClient.NET](https://github.com/ErenKrt/TlsClient.NET), providing customizable HTTP/2 clients with TLS fingerprinting capabilities. Based on [bogdanfinn/tls-client](https://github.com/bogdanfinn/tls-client/), it allows you to mimic specific browser fingerprints and control detailed aspects of TLS behavior in your .NET applications.
+Http2Client is a fork of [TlsClient.NET](https://github.com/ErenKrt/TlsClient.NET), providing customizable HTTP/2 clients with TLS fingerprinting capabilities. Based on [bogdanfinn/tls-client](https://github.com/bogdanfinn/tls-client/), it allows you to mimic specific browser fingerprints and control detailed aspects of TLS behavior in your .NET applications.
 
-Note: The licensing status of the original TlsClient.NET repository is currently unclear. This fork does not claim ownership of the original code. Use it responsibly, and refer to the original projects for context and licensing information.
+>**Note: The licensing status of the original TlsClient.NET repository is currently unclear. This fork does not claim ownership of the original code. Use it responsibly, and refer to the original projects for context and licensing information.**
 
 ## Installation
 
