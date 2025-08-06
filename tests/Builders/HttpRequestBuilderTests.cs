@@ -9,7 +9,7 @@ namespace Http2Client.Test.Builders;
 public class HttpRequestBuilderTests
 {
     [Fact]
-    public void Build_NoUrl_Throws()
+    public void NoUrl_Throws()
     {
         var builder = new HttpRequestBuilder();
 
@@ -19,7 +19,7 @@ public class HttpRequestBuilderTests
     }
 
     [Fact]
-    public void WithMethod_String_UppercasesMethod()
+    public void Method_String_Works()
     {
         var request = new HttpRequestBuilder()
             .WithUrl("https://example.com")
@@ -30,7 +30,7 @@ public class HttpRequestBuilderTests
     }
 
     [Fact]
-    public void WithMethod_HttpMethod_SetsMethod()
+    public void Method_Enum_Works()
     {
         var request = new HttpRequestBuilder()
             .WithUrl("https://example.com")
@@ -41,7 +41,7 @@ public class HttpRequestBuilderTests
     }
 
     [Fact]
-    public void WithJsonBody_SetsBodyAndContentType()
+    public void JsonBody_Works()
     {
         var data = new { name = "test", value = 123 };
 
@@ -55,7 +55,7 @@ public class HttpRequestBuilderTests
     }
 
     [Fact]
-    public void WithBinaryBody_SetsByteRequest()
+    public void BinaryBody_Works()
     {
         var data = new byte[] { 1, 2, 3, 4 };
 
@@ -69,7 +69,7 @@ public class HttpRequestBuilderTests
     }
 
     [Fact]
-    public void WithTimeout_NegativeTimeout_Throws()
+    public void Timeout_Negative_Throws()
     {
         var builder = new HttpRequestBuilder()
             .WithUrl("https://example.com")
@@ -81,7 +81,7 @@ public class HttpRequestBuilderTests
     }
 
     [Fact]
-    public void ChainedCalls_BuildsCorrectRequest()
+    public void Chaining_Works()
     {
         var cookie = new ClientCookie { Name = "test", Value = "value" };
 
@@ -104,7 +104,7 @@ public class HttpRequestBuilderTests
     }
 
     [Fact]
-    public void With_CustomModification_Works()
+    public void Custom_Works()
     {
         var request = new HttpRequestBuilder()
             .WithUrl("https://example.com")

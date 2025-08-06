@@ -8,7 +8,7 @@ namespace Http2Client.Test.Builders;
 public class HttpClientBuilderTests
 {
     [Fact]
-    public void WithTimeout_ZeroTimeout_Throws()
+    public void Timeout_Throws()
     {
         var builder = new HttpClientBuilder();
 
@@ -18,9 +18,8 @@ public class HttpClientBuilderTests
     }
 
     [Fact]
-    public void WithCookies_SetsCorrectly()
+    public void Cookies_Work()
     {
-        // Create temporary files to avoid FileNotFoundException
         var tempFile1 = Path.GetTempFileName();
         var tempFile2 = Path.GetTempFileName();
         try
@@ -49,7 +48,7 @@ public class HttpClientBuilderTests
     }
 
     [Fact]
-    public void WithUserAgent_SetsUserAgentHeader()
+    public void UserAgent_Works()
     {
         const string userAgent = "Test-Agent/1.0";
         var tempFile = Path.GetTempFileName();
@@ -70,7 +69,7 @@ public class HttpClientBuilderTests
     }
 
     [Fact]
-    public void WithHeaders_AddsMultipleHeaders()
+    public void Headers_Work()
     {
         var headers = new Dictionary<string, string>
         {
@@ -95,7 +94,7 @@ public class HttpClientBuilderTests
     }
 
     [Fact]
-    public void ChainedCalls_BuildsCorrectOptions()
+    public void Chaining_Works()
     {
         var tempFile = Path.GetTempFileName();
         try

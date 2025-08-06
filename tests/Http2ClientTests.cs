@@ -7,7 +7,7 @@ namespace Http2Client.Test;
 public class Http2ClientTests
 {
     [Fact]
-    public void Constructor_NullOptions_Throws()
+    public void Ctor_Null_Throws()
     {
         var action = () => new Http2Client(null!);
 
@@ -15,7 +15,7 @@ public class Http2ClientTests
     }
 
     [Fact]
-    public void Constructor_InvalidOptions_Throws()
+    public void Ctor_Invalid_Throws()
     {
         var options = new Http2ClientOptions { Timeout = TimeSpan.Zero };
 
@@ -25,7 +25,7 @@ public class Http2ClientTests
     }
 
     [Fact]
-    public void Constructor_MissingLibrary_Throws()
+    public void Ctor_NoLib_Throws()
     {
         var options = new Http2ClientOptions { LibraryPath = "nonexistent.dll" };
 
@@ -35,23 +35,20 @@ public class Http2ClientTests
     }
 
     [Fact]
-    public void SessionId_ReturnsOptionsSessionId()
+    public void SessionId_Works()
     {
         var options = new Http2ClientOptions();
         var expectedSessionId = options.SessionID;
 
-        // Since we can't create a real client without the native library, we test that the property
-        // would return the correct value
         expectedSessionId.Should().NotBeEmpty();
         options.SessionID.Should().Be(expectedSessionId);
     }
 
     [Fact]
-    public void Options_Property_ReturnsCorrectReference()
+    public void Options_Works()
     {
         var options = new Http2ClientOptions();
 
-        // Test that the options reference is maintained correctly
         options.BrowserType.Should().Be(BrowserType.Chrome131);
         options.Timeout.Should().Be(TimeSpan.FromSeconds(60));
     }

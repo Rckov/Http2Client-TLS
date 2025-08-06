@@ -15,7 +15,7 @@ public class HttpResponseTests
     [InlineData(HttpStatusCode.BadRequest, false)]
     [InlineData(HttpStatusCode.NotFound, false)]
     [InlineData(HttpStatusCode.InternalServerError, false)]
-    public void IsSuccessStatus_ReturnsCorrectValue(HttpStatusCode status, bool expected)
+    public void IsSuccess_Works(HttpStatusCode status, bool expected)
     {
         var response = new HttpResponse { Status = status };
 
@@ -23,7 +23,7 @@ public class HttpResponseTests
     }
 
     [Fact]
-    public void GetHeader_ExistingHeader_ReturnsFirstValue()
+    public void GetHeader_Exists_Works()
     {
         var response = new HttpResponse();
         response.Headers["Content-Type"] = ["application/json", "charset=utf-8"];
@@ -34,7 +34,7 @@ public class HttpResponseTests
     }
 
     [Fact]
-    public void GetHeader_NonExistingHeader_ReturnsNull()
+    public void GetHeader_Missing_Null()
     {
         var response = new HttpResponse();
 
@@ -44,7 +44,7 @@ public class HttpResponseTests
     }
 
     [Fact]
-    public void GetHeaderValues_ExistingHeader_ReturnsAllValues()
+    public void GetHeaderValues_Exists_Works()
     {
         var response = new HttpResponse();
         response.Headers["Set-Cookie"] = ["cookie1=value1", "cookie2=value2"];
@@ -55,7 +55,7 @@ public class HttpResponseTests
     }
 
     [Fact]
-    public void GetHeaderValues_NonExistingHeader_ReturnsEmptyList()
+    public void GetHeaderValues_Missing_Empty()
     {
         var response = new HttpResponse();
 
@@ -65,7 +65,7 @@ public class HttpResponseTests
     }
 
     [Fact]
-    public void GetCookie_ExistingCookie_ReturnsValue()
+    public void GetCookie_Exists_Works()
     {
         var response = new HttpResponse();
         response.Cookies["session"] = "abc123";
@@ -76,7 +76,7 @@ public class HttpResponseTests
     }
 
     [Fact]
-    public void GetCookie_NonExistingCookie_ReturnsNull()
+    public void GetCookie_Missing_Null()
     {
         var response = new HttpResponse();
 
@@ -86,7 +86,7 @@ public class HttpResponseTests
     }
 
     [Fact]
-    public void ContentLength_ValidHeader_ReturnsLength()
+    public void ContentLength_Valid_Works()
     {
         var response = new HttpResponse();
         response.Headers["Content-Length"] = ["1024"];
@@ -95,7 +95,7 @@ public class HttpResponseTests
     }
 
     [Fact]
-    public void ContentLength_InvalidHeader_ReturnsMinusOne()
+    public void ContentLength_Invalid_MinusOne()
     {
         var response = new HttpResponse();
         response.Headers["Content-Length"] = ["invalid"];

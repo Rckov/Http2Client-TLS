@@ -3,8 +3,6 @@ using FluentAssertions;
 using Http2Client.Core.Enums;
 using Http2Client.Utilities;
 
-using System.Text.Json;
-
 namespace Http2Client.Test.Core.Converters;
 
 public class JsonBrowserTypeConverterTests

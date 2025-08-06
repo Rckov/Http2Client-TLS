@@ -7,7 +7,7 @@ namespace Http2Client.Test;
 public class Http2ClientOptionsTests
 {
     [Fact]
-    public void Constructor_SetsDefaults()
+    public void SetsDefaults()
     {
         var options = new Http2ClientOptions();
 
@@ -19,7 +19,7 @@ public class Http2ClientOptionsTests
     }
 
     [Fact]
-    public void UserAgent_SetAndGet_UpdatesHeadersCorrectly()
+    public void UserAgent_Sets()
     {
         var options = new Http2ClientOptions();
         const string userAgent = "Test-Agent/1.0";
@@ -31,7 +31,7 @@ public class Http2ClientOptionsTests
     }
 
     [Fact]
-    public void UserAgent_SetNull_RemovesHeader()
+    public void UserAgent_Null_Removes()
     {
         var options = new Http2ClientOptions();
         options.UserAgent = "Test-Agent/1.0";
@@ -43,9 +43,8 @@ public class Http2ClientOptionsTests
     }
 
     [Fact]
-    public void Validate_BothCookieOptions_Throws()
+    public void Validate_Cookies_Throws()
     {
-        // Create a temporary file to avoid FileNotFoundException
         var tempFile = Path.GetTempFileName();
         try
         {
@@ -67,9 +66,8 @@ public class Http2ClientOptionsTests
     }
 
     [Fact]
-    public void Validate_BothIPDisabled_Throws()
+    public void Validate_IP_Throws()
     {
-        // Create a temporary file to avoid FileNotFoundException
         var tempFile = Path.GetTempFileName();
         try
         {
@@ -91,9 +89,8 @@ public class Http2ClientOptionsTests
     }
 
     [Fact]
-    public void Validate_ZeroTimeout_Throws()
+    public void Validate_Timeout_Throws()
     {
-        // Create a temporary file to avoid FileNotFoundException
         var tempFile = Path.GetTempFileName();
         try
         {
@@ -114,7 +111,7 @@ public class Http2ClientOptionsTests
     }
 
     [Fact]
-    public void Validate_MissingLibraryFile_Throws()
+    public void Validate_Lib_Throws()
     {
         var options = new Http2ClientOptions { LibraryPath = "nonexistent.dll" };
 
@@ -124,7 +121,7 @@ public class Http2ClientOptionsTests
     }
 
     [Fact]
-    public void Clone_CreatesDeepCopy()
+    public void Clone_Works()
     {
         var original = new Http2ClientOptions
         {
