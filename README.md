@@ -4,7 +4,9 @@
 
 ## Installation
 
-Currently, Http2Client is available as source code. NuGet packages will be available in the future.
+```bash
+dotnet add package Http2Client
+```
 
 ### Native Library Dependencies
 
