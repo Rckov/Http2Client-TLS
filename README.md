@@ -1,6 +1,7 @@
 [![Target Frameworks](https://img.shields.io/badge/Target%20Frameworks-netstandard2.0%20%7C%20net5.0%20%7C%20net6.0%20%7C%20net8.0%20%7C%20net9.0-512BD4)]()
 [![Build and Release](https://github.com/Rckov/Http2Client-TLS/actions/workflows/release.yml/badge.svg)](https://github.com/Rckov/Http2Client-TLS/actions/workflows/release.yml)
 [![GitHub Release](https://img.shields.io/github/v/release/Rckov/Http2Client-TLS)](https://github.com/Rckov/Http2Client-TLS/releases/latest)
+[![NuGet](https://img.shields.io/nuget/v/Http2Client.svg?label=NuGet)](https://www.nuget.org/packages/Http2Client)
 
 # Http2Client
 
