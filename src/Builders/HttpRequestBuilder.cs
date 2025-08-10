@@ -1,81 +1,59 @@
 ﻿using Http2Client.Core.Enums;
 using Http2Client.Core.Models;
 using Http2Client.Core.Request;
+using Http2Client.Utilities;
 
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 
 namespace Http2Client.Builders;
 
 /// <summary>
-/// Builder for HttpRequest. Simplifies request configuration.
+/// Builder for <see cref="HttpRequest" />. Simplifies request configuration.
 /// </summary>
 public class HttpRequestBuilder
 {
     private readonly HttpRequest _request = new();
 
     /// <summary>
-    /// Sets target URL. Required field.
+    /// Pins certificates for host to detect MITM.
     /// </summary>
-    public HttpRequestBuilder WithUrl(string url)
+    public HttpRequestBuilder WithCertificatePinning(string host, List<string> pins)
     {
-        _request.RequestUrl = url ?? throw new ArgumentNullException(nameof(url));
+        ThrowException.NullOrEmpty(host, nameof(host));
+        ThrowException.Null(pins, nameof(pins));
+
+        if (pins.Count == 0)
+        {
+            throw new ArgumentException("Certificate pins list cannot be empty.", nameof(pins));
+        }
+
+        _request.CertificatePinningHosts[host] = pins;
         return this;
     }
 
     /// <summary>
-    /// Sets HTTP method (GET, POST, etc). Auto-uppercased.
+    /// Uses custom TLS config instead of browser preset.
     /// </summary>
-    public HttpRequestBuilder WithMethod(string method)
+    public HttpRequestBuilder WithCustomHttp2Client(CustomHttp2Client tlsClient)
     {
-        _request.RequestMethod = method?.ToUpperInvariant() ?? "GET";
+        ThrowException.Null(tlsClient, nameof(tlsClient));
+
+        _request.CustomHttp2Client = tlsClient;
         return this;
     }
 
     /// <summary>
-    /// Sets HTTP method using HttpMethod class.
+    /// Sets transport layer options.
     /// </summary>
-    public HttpRequestBuilder WithMethod(HttpMethod method)
+    public HttpRequestBuilder WithTransportOptions(TransportOptions options)
     {
-        return WithMethod(method.Method);
-    }
+        ThrowException.Null(options, nameof(options));
 
-    /// <summary>
-    /// Sends a raw string as the request body. You’ll need to set Content-Type yourself if required.
-    /// </summary>
-    public HttpRequestBuilder WithBody(string body)
-    {
-        _request.RequestBody = body;
-        return this;
-    }
-
-    /// <summary>
-    /// Sets JSON body and Content-Type header.
-    /// </summary>
-    public HttpRequestBuilder WithJsonBody<T>(T data)
-    {
-        _request.RequestBody = JsonSerializer.Serialize(data);
-        return WithHeader("Content-Type", "application/json");
-    }
-
-    /// <summary>
-    /// Sets binary data as Base64-encoded body.
-    /// </summary>
-    public HttpRequestBuilder WithBinaryBody(byte[] data)
-    {
-        _request.RequestBody = Convert.ToBase64String(data);
-        _request.IsByteRequest = true;
-        return this;
-    }
-
-    /// <summary>
-    /// Expect binary response instead of text.
-    /// </summary>
-    public HttpRequestBuilder WithByteResponse(bool enabled = true)
-    {
-        _request.IsByteResponse = enabled;
+        _request.TransportOptions = options;
         return this;
     }
 
@@ -93,6 +71,8 @@ public class HttpRequestBuilder
     /// </summary>
     public HttpRequestBuilder WithHeaders(Dictionary<string, string> headers)
     {
+        ThrowException.Null(headers, nameof(headers));
+
         foreach (var kvp in headers)
         {
             _request.Headers[kvp.Key] = kvp.Value;
@@ -102,20 +82,175 @@ public class HttpRequestBuilder
     }
 
     /// <summary>
-    /// Adds cookies to request.
+    /// Adds default headers merged with request headers.
     /// </summary>
-    public HttpRequestBuilder WithCookies(List<ClientCookie> cookies)
+    public HttpRequestBuilder AddDefaultHeaders(Dictionary<string, List<string>> headers)
     {
-        _request.RequestCookies.AddRange(cookies);
+        ThrowException.Null(headers, nameof(headers));
+
+        foreach (var kvp in headers)
+        {
+            _request.DefaultHeaders[kvp.Key] = kvp.Value;
+        }
+
         return this;
     }
 
     /// <summary>
-    /// Adds single cookie to request.
+    /// Adds headers for CONNECT proxy requests.
     /// </summary>
-    public HttpRequestBuilder AddCookie(ClientCookie cookie)
+    public HttpRequestBuilder AddConnectHeaders(Dictionary<string, List<string>> headers)
     {
-        _request.RequestCookies.Add(cookie);
+        ThrowException.Null(headers, nameof(headers));
+
+        foreach (var kvp in headers)
+        {
+            _request.ConnectHeaders[kvp.Key] = kvp.Value;
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// Binds request to specific local IP.
+    /// </summary>
+    public HttpRequestBuilder WithLocalAddress(string ip)
+    {
+        ThrowException.NullOrEmpty(ip, nameof(ip));
+
+        if (!IPAddress.TryParse(ip, out _))
+        {
+            throw new ArgumentException("Local address must be a valid IP address.", nameof(ip));
+        }
+
+        _request.LocalAddress = ip;
+        return this;
+    }
+
+    /// <summary>
+    /// Overrides TLS SNI hostname.
+    /// </summary>
+    public HttpRequestBuilder WithServerName(string sni)
+    {
+        ThrowException.NullOrEmpty(sni, nameof(sni));
+
+        _request.ServerNameOverwrite = sni;
+        return this;
+    }
+
+    /// <summary>
+    /// Routes request through proxy. Mark as rotating if needed.
+    /// </summary>
+    public HttpRequestBuilder WithProxy(string? proxyUrl, bool isRotating = false)
+    {
+        ThrowException.IsUri(proxyUrl, nameof(proxyUrl));
+
+        _request.ProxyUrl = proxyUrl;
+        _request.IsRotatingProxy = isRotating;
+        return this;
+    }
+
+    /// <summary>
+    /// Sends a raw string as the request body. You'll need to set Content-Type yourself if required.
+    /// </summary>
+    public HttpRequestBuilder WithBody(string body)
+    {
+        _request.RequestBody = body;
+        return this;
+    }
+
+    /// <summary>
+    /// Sets JSON body and Content-Type header.
+    /// </summary>
+    public HttpRequestBuilder WithJsonBody<T>(T data)
+    {
+        ThrowException.Null(data, nameof(data));
+
+        try
+        {
+            _request.RequestBody = JsonSerializer.Serialize(data);
+        }
+        catch (JsonException ex)
+        {
+            throw new ArgumentException($"Failed to serialize data to JSON: {ex.Message}", nameof(data), ex);
+        }
+
+        return WithHeader("Content-Type", "application/json");
+    }
+
+    /// <summary>
+    /// Sets binary data as Base64-encoded body.
+    /// </summary>
+    public HttpRequestBuilder WithBinaryBody(byte[] data)
+    {
+        ThrowException.Null(data, nameof(data));
+
+        const int maxSize = 50 * 1024 * 1024; // 50MB
+        if (data.Length > maxSize)
+        {
+            throw new ArgumentException($"Binary data too large: {data.Length} bytes. Maximum allowed: {maxSize} bytes.", nameof(data));
+        }
+
+        _request.RequestBody = Convert.ToBase64String(data);
+        _request.IsByteRequest = true;
+        return this;
+    }
+
+    /// <summary>
+    /// Overrides Host header. Doesn't affect TLS SNI.
+    /// </summary>
+    public HttpRequestBuilder WithHostOverride(string host)
+    {
+        ThrowException.NullOrEmpty(host, nameof(host));
+
+        _request.RequestHostOverride = host;
+        return this;
+    }
+
+    /// <summary>
+    /// Sets session ID for connection reuse.
+    /// </summary>
+    public HttpRequestBuilder WithSessionId(Guid sessionId)
+    {
+        _request.SessionId = sessionId;
+        return this;
+    }
+
+    /// <summary>
+    /// Saves streamed response to file.
+    /// </summary>
+    public HttpRequestBuilder WithStreamOutput(string? path, int? blockSize = null, string? eofSymbol = null)
+    {
+        if (blockSize.HasValue && blockSize <= 0)
+        {
+            throw new ArgumentException("StreamOutputBlockSize must be positive if specified.", nameof(blockSize));
+        }
+
+        _request.StreamOutputPath = path;
+        _request.StreamOutputBlockSize = blockSize;
+        _request.StreamOutputEofSymbol = eofSymbol;
+        return this;
+    }
+
+    /// <summary>
+    /// Sets HTTP method using <see cref="HttpMethod" /> class.
+    /// </summary>
+    public HttpRequestBuilder WithMethod(HttpMethod method)
+    {
+        ThrowException.Null(method, nameof(method));
+
+        _request.RequestMethod = method.Method;
+        return this;
+    }
+
+    /// <summary>
+    /// Sets target URL. Required field.
+    /// </summary>
+    public HttpRequestBuilder WithUrl(string url)
+    {
+        ThrowException.IsUri(url, nameof(url));
+
+        _request.RequestUrl = url;
         return this;
     }
 
@@ -129,57 +264,35 @@ public class HttpRequestBuilder
     }
 
     /// <summary>
-    /// Uses custom TLS config instead of browser preset.
+    /// Sets header order. Some servers check this.
     /// </summary>
-    public HttpRequestBuilder WithCustomHttp2Client(CustomHttp2Client tlsClient)
+    public HttpRequestBuilder AddHeaderOrder(params string[] headerNames)
     {
-        _request.CustomHttp2Client = tlsClient;
+        ThrowException.Null(headerNames, nameof(headerNames));
+
+        _request.HeaderOrder.AddRange(headerNames);
         return this;
     }
 
     /// <summary>
-    /// Randomizes TLS extension order.
+    /// Adds cookies to request.
     /// </summary>
-    public HttpRequestBuilder WithRandomTlsExtensions(bool enable = true)
+    public HttpRequestBuilder WithCookies(List<ClientCookie> cookies)
     {
-        _request.WithRandomTLSExtensionOrder = enable;
+        ThrowException.Null(cookies, nameof(cookies));
+
+        _request.RequestCookies.AddRange(cookies);
         return this;
     }
 
     /// <summary>
-    /// Routes request through proxy. Mark as rotating if needed.
+    /// Adds single cookie to request.
     /// </summary>
-    public HttpRequestBuilder WithProxy(string proxyUrl, bool? isRotating = null)
+    public HttpRequestBuilder AddCookie(ClientCookie cookie)
     {
-        _request.ProxyUrl = proxyUrl;
-        _request.IsRotatingProxy = isRotating;
-        return this;
-    }
+        ThrowException.Null(cookie, nameof(cookie));
 
-    /// <summary>
-    /// Binds request to specific local IP.
-    /// </summary>
-    public HttpRequestBuilder WithLocalAddress(string ip)
-    {
-        _request.LocalAddress = ip;
-        return this;
-    }
-
-    /// <summary>
-    /// Overrides Host header. Doesn't affect TLS SNI.
-    /// </summary>
-    public HttpRequestBuilder WithHostOverride(string host)
-    {
-        _request.RequestHostOverride = host;
-        return this;
-    }
-
-    /// <summary>
-    /// Overrides TLS SNI hostname.
-    /// </summary>
-    public HttpRequestBuilder WithServerName(string sni)
-    {
-        _request.ServerNameOverwrite = sni;
+        _request.RequestCookies.Add(cookie);
         return this;
     }
 
@@ -188,7 +301,27 @@ public class HttpRequestBuilder
     /// </summary>
     public HttpRequestBuilder WithTimeout(TimeSpan timeout)
     {
+        if (timeout <= TimeSpan.Zero)
+        {
+            throw new ArgumentException("Timeout must be greater than zero.", nameof(timeout));
+        }
+
+        if (timeout > TimeSpan.FromMinutes(30))
+        {
+            throw new ArgumentException("Timeout cannot exceed 30 minutes.", nameof(timeout));
+        }
+
         _request.TimeoutMilliseconds = (int)timeout.TotalMilliseconds;
+        _request.TimeoutSeconds = (int)timeout.TotalSeconds;
+        return this;
+    }
+
+    /// <summary>
+    /// Enables catching native library panics. Enabled by default for stability.
+    /// </summary>
+    public HttpRequestBuilder WithCatchPanics(bool enable = true)
+    {
+        _request.CatchPanics = enable;
         return this;
     }
 
@@ -220,11 +353,11 @@ public class HttpRequestBuilder
     }
 
     /// <summary>
-    /// Disables IPv4 for this request.
+    /// Expect binary response instead of text.
     /// </summary>
-    public HttpRequestBuilder WithDisableIPv4(bool disable = true)
+    public HttpRequestBuilder WithByteResponse(bool enabled = true)
     {
-        _request.DisableIPv4 = disable;
+        _request.IsByteResponse = enabled;
         return this;
     }
 
@@ -234,6 +367,15 @@ public class HttpRequestBuilder
     public HttpRequestBuilder WithDisableIPv6(bool disable = true)
     {
         _request.DisableIPv6 = disable;
+        return this;
+    }
+
+    /// <summary>
+    /// Disables IPv4 for this request.
+    /// </summary>
+    public HttpRequestBuilder WithDisableIPv4(bool disable = true)
+    {
+        _request.DisableIPv4 = disable;
         return this;
     }
 
@@ -265,75 +407,11 @@ public class HttpRequestBuilder
     }
 
     /// <summary>
-    /// Saves streamed response to file.
+    /// Randomizes TLS extension order.
     /// </summary>
-    public HttpRequestBuilder WithStreamOutput(string? path, int? blockSize = null, string? eofSymbol = null)
+    public HttpRequestBuilder WithRandomTlsExtensions(bool enable = true)
     {
-        _request.StreamOutputPath = path;
-        _request.StreamOutputBlockSize = blockSize;
-        _request.StreamOutputEOFSymbol = eofSymbol;
-        return this;
-    }
-
-    /// <summary>
-    /// Pins certificates for host to detect MITM.
-    /// </summary>
-    public HttpRequestBuilder WithCertificatePinning(string host, List<string> pins)
-    {
-        _request.CertificatePinningHosts[host] = pins;
-        return this;
-    }
-
-    /// <summary>
-    /// Sets transport layer options.
-    /// </summary>
-    public HttpRequestBuilder WithTransportOptions(TransportOptions options)
-    {
-        _request.TransportOptions = options;
-        return this;
-    }
-
-    /// <summary>
-    /// Sets header order. Some servers check this.
-    /// </summary>
-    public HttpRequestBuilder AddHeaderOrder(params string[] headerNames)
-    {
-        _request.HeaderOrder.AddRange(headerNames);
-        return this;
-    }
-
-    /// <summary>
-    /// Adds default headers merged with request headers.
-    /// </summary>
-    public HttpRequestBuilder AddDefaultHeaders(Dictionary<string, List<string>> headers)
-    {
-        foreach (var kvp in headers)
-        {
-            _request.DefaultHeaders[kvp.Key] = kvp.Value;
-        }
-
-        return this;
-    }
-
-    /// <summary>
-    /// Adds headers for CONNECT proxy requests.
-    /// </summary>
-    public HttpRequestBuilder AddConnectHeaders(Dictionary<string, List<string>> headers)
-    {
-        foreach (var kvp in headers)
-        {
-            _request.ConnectHeaders[kvp.Key] = kvp.Value;
-        }
-
-        return this;
-    }
-
-    /// <summary>
-    /// Sets session ID for connection reuse.
-    /// </summary>
-    public HttpRequestBuilder WithSessionId(Guid sessionId)
-    {
-        _request.SessionId = sessionId;
+        _request.WithRandomTlsExtensionOrder = enable;
         return this;
     }
 
@@ -356,18 +434,26 @@ public class HttpRequestBuilder
     }
 
     /// <summary>
-    /// Validates request for required fields.
+    /// Validates request for conflicting settings and required fields.
     /// </summary>
     private void Validate()
     {
+        // Required fields - only check if not set through builder methods
         if (string.IsNullOrWhiteSpace(_request.RequestUrl))
         {
             throw new InvalidOperationException("RequestUrl is required. Use WithUrl() to set it.");
         }
 
-        if (_request.TimeoutMilliseconds.HasValue && _request.TimeoutMilliseconds <= 0)
+        // Conflicting cookie settings
+        if (_request.WithDefaultCookieJar == true && _request.WithoutCookieJar == true)
         {
-            throw new InvalidOperationException("TimeoutMilliseconds must be positive if specified.");
+            throw new InvalidOperationException("Cannot enable both WithDefaultCookieJar and WithoutCookieJar.");
+        }
+
+        // Conflicting IP settings
+        if (_request.DisableIPv4 == true && _request.DisableIPv6 == true)
+        {
+            throw new InvalidOperationException("Cannot disable both IPv4 and IPv6.");
         }
     }
 }

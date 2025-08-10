@@ -22,6 +22,7 @@ public class CustomHttp2Client
     /// HTTP/2 header priority config.
     /// </summary>
     [JsonPropertyName("headerPriority")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public PriorityParam? HeaderPriority { get; set; }
 
     /// <summary>

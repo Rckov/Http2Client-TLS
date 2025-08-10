@@ -3,6 +3,8 @@ using FluentAssertions;
 using Http2Client.Core.Enums;
 using Http2Client.Utilities;
 
+using Xunit;
+
 namespace Http2Client.Test.Core.Converters;
 
 public class JsonBrowserTypeConverterTests
@@ -14,7 +16,6 @@ public class JsonBrowserTypeConverterTests
     public void Serialize_BrowserType_WritesCorrectString(BrowserType browserType, string expected)
     {
         var result = Serializer.Serialize(browserType);
-
         result.Should().Be(expected);
     }
 
@@ -24,7 +25,6 @@ public class JsonBrowserTypeConverterTests
         const string json = "\"chrome_131\"";
 
         var result = Serializer.Deserialize<BrowserType>(json);
-
         result.Should().Be(BrowserType.Chrome131);
     }
 
@@ -34,7 +34,6 @@ public class JsonBrowserTypeConverterTests
         const string json = "\"invalid_browser\"";
 
         var action = () => Serializer.Deserialize<BrowserType>(json);
-
         action.Should().Throw<ArgumentException>();
     }
 

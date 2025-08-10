@@ -1,6 +1,5 @@
 ﻿using Http2Client.Core.Converters;
 
-using System;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -12,7 +11,7 @@ namespace Http2Client.Utilities;
 /// </summary>
 internal static class Serializer
 {
-    private static readonly JsonSerializerOptions _options = new()
+    private static readonly JsonSerializerOptions Options = new()
     {
         WriteIndented = false,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -26,21 +25,27 @@ internal static class Serializer
     /// <summary>
     /// Serializes object to JSON string.
     /// </summary>
-    public static string Serialize<T>(T data) => JsonSerializer.Serialize(data, _options);
+    public static string Serialize<T>(T data)
+    {
+        ThrowException.Null(data, nameof(data));
+        return JsonSerializer.Serialize(data, Options);
+    }
 
     /// <summary>
     /// Serializes object to UTF-8 bytes for native library.
     /// </summary>
-    public static byte[] SerializeToBytes<T>(T data) => Encoding.UTF8.GetBytes(Serialize(data));
+    public static byte[] SerializeToBytes<T>(T data)
+    {
+        ThrowException.Null(data, nameof(data));
+        return Encoding.UTF8.GetBytes(Serialize(data));
+    }
 
     /// <summary>
     /// Deserializes JSON string to object.
     /// </summary>
-    public static T Deserialize<T>(string json)
+    public static T? Deserialize<T>(string json)
     {
         ThrowException.NullOrEmpty(json, nameof(json));
-
-        var result = JsonSerializer.Deserialize<T>(json, _options);
-        return result ?? throw new InvalidOperationException("Deserialization returned null");
+        return JsonSerializer.Deserialize<T>(json, Options);
     }
 }

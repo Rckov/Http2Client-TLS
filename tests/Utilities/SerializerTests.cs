@@ -1,9 +1,10 @@
 using FluentAssertions;
 
-using Http2Client.Core.Enums;
 using Http2Client.Utilities;
 
 using System.Text;
+
+using Xunit;
 
 namespace Http2Client.Test.Utilities;
 
@@ -39,16 +40,6 @@ public class SerializerTests
         var action = () => Serializer.Deserialize<TestObject>(json);
 
         action.Should().Throw<ArgumentException>();
-    }
-
-    [Fact]
-    public void Serialize_BrowserType_UsesConverter()
-    {
-        var obj = new { browser = BrowserType.Chrome131 };
-
-        var result = Serializer.Serialize(obj);
-
-        result.Should().Contain("chrome_131");
     }
 
     private class TestObject

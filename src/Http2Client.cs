@@ -26,7 +26,7 @@ public sealed class Http2Client : IDisposable
     /// <summary>
     /// Session ID for this client instance.
     /// </summary>
-    public Guid SessionId => _options.SessionID;
+    public Guid SessionId => _options.SessionId;
 
     /// <summary>
     /// True if this client has been disposed.
@@ -40,7 +40,7 @@ public sealed class Http2Client : IDisposable
     public Http2Client(Http2ClientOptions options)
     {
         _options = options ?? throw new ArgumentNullException(nameof(options));
-        _options.Validate(); // Make sure settings make sense
+        _options.Validate();
         _wrapper = NativeWrapper.Load(_options.LibraryPath);
     }
 
@@ -56,7 +56,7 @@ public sealed class Http2Client : IDisposable
     /// </summary>
     /// <param name="request">Request to send</param>
     /// <returns>HTTP response</returns>
-    public HttpResponse Send(HttpRequest request)
+    public HttpResponse? Send(HttpRequest request)
     {
         ThrowException.Null(request, nameof(request));
         ThrowException.NullOrEmpty(request.RequestUrl, nameof(request.RequestUrl));
@@ -90,14 +90,14 @@ public sealed class Http2Client : IDisposable
     /// </summary>
     /// <param name="url">URL to get cookies for</param>
     /// <returns>Response with cookies</returns>
-    public CookiesResponse GetCookies(string url)
+    public CookiesResponse? GetCookies(string url)
     {
         ThrowException.NullOrEmpty(url, nameof(url));
 
-        var payload = new GetCookiesRequest()
+        var payload = new GetCookiesRequest
         {
             Url = url,
-            SessionId = _options.SessionID,
+            SessionId = _options.SessionId,
         };
 
         var responseJson = _wrapper.GetCookiesFromSession(Serializer.SerializeToBytes(payload));
@@ -110,15 +110,15 @@ public sealed class Http2Client : IDisposable
     /// <param name="url">URL to add cookies for</param>
     /// <param name="cookies">Cookies to add</param>
     /// <returns>Response with updated cookies</returns>
-    public CookiesResponse AddCookies(string url, IEnumerable<ClientCookie> cookies)
+    public CookiesResponse? AddCookies(string url, IEnumerable<ClientCookie> cookies)
     {
         ThrowException.NullOrEmpty(url, nameof(url));
         ThrowException.Null(cookies, nameof(cookies));
 
-        var payload = new AddCookiesRequest()
+        var payload = new AddCookiesRequest
         {
             Url = url,
-            SessionId = _options.SessionID,
+            SessionId = _options.SessionId,
             Cookies = [.. cookies]
         };
 
@@ -134,7 +134,7 @@ public sealed class Http2Client : IDisposable
     {
         try
         {
-            var payload = new { sessionId = _options.SessionID };
+            var payload = new { sessionId = _options.SessionId };
             var responseJson = _wrapper.DestroySession(Serializer.SerializeToBytes(payload));
             return !string.IsNullOrEmpty(responseJson);
         }
@@ -163,14 +163,25 @@ public sealed class Http2Client : IDisposable
     }
 
     /// <summary>
-    /// Merge client options with request settings. Request wins if both set.
+    /// Takes the user's request and mixes it with our client settings.
+    /// If both have the same setting, the request wins.
     /// </summary>
-    /// <param name="request">Original request</param>
-    /// <returns>Request with merged settings</returns>
     private HttpRequest PrepareRequest(HttpRequest request)
     {
-        // Start with a copy of the request
-        var req = new HttpRequest
+        var preparedRequest = CopyRequest(request);
+
+        SetHeaders(preparedRequest);
+        SetDefaults(preparedRequest);
+
+        return preparedRequest;
+    }
+
+    /// <summary>
+    /// Makes a fresh copy of the request so we don't mess with the original.
+    /// </summary>
+    private HttpRequest CopyRequest(HttpRequest request)
+    {
+        return new HttpRequest
         {
             Id = request.Id,
             RequestUrl = request.RequestUrl,
@@ -184,62 +195,70 @@ public sealed class Http2Client : IDisposable
             HeaderOrder = [.. request.HeaderOrder],
             CertificatePinningHosts = new Dictionary<string, List<string>>(request.CertificatePinningHosts),
             StreamOutputBlockSize = request.StreamOutputBlockSize,
-            StreamOutputEOFSymbol = request.StreamOutputEOFSymbol,
+            StreamOutputEofSymbol = request.StreamOutputEofSymbol,
             StreamOutputPath = request.StreamOutputPath,
             RequestCookies = request.RequestCookies,
             TransportOptions = request.TransportOptions
         };
+    }
 
-        // Fill in missing values from client defaults (null coalescing is your friend)
-        req.SessionId ??= _options.SessionID;
-        req.CustomHttp2Client ??= _options.CustomHttp2Client;
-        req.ProxyUrl ??= _options.ProxyUrl;
-        req.IsRotatingProxy ??= _options.IsRotatingProxy;
-        req.InsecureSkipVerify ??= _options.InsecureSkipVerify;
-        req.DisableIPv4 ??= _options.DisableIPv4;
-        req.DisableIPv6 ??= _options.DisableIPv6;
-        req.WithDebug ??= _options.WithDebug;
-        req.WithDefaultCookieJar ??= _options.WithDefaultCookieJar;
-        req.WithoutCookieJar ??= _options.WithoutCookieJar;
-        req.FollowRedirects ??= _options.FollowRedirects;
+    /// <summary>
+    /// Fills in any missing settings from our client defaults.
+    /// Only touches stuff that wasn't already set in the request.
+    /// </summary>
+    private void SetDefaults(HttpRequest request)
+    {
+        // Apply nullable defaults using null coalescing
+        request.SessionId ??= _options.SessionId;
+        request.CustomHttp2Client ??= _options.CustomHttp2Client;
+        request.ProxyUrl ??= _options.ProxyUrl;
 
-        if (req.BrowserType != default)
+        // Apply boolean defaults from client options
+        request.IsRotatingProxy = _options.IsRotatingProxy;
+        request.InsecureSkipVerify = _options.InsecureSkipVerify;
+        request.DisableIPv4 = _options.DisableIPv4;
+        request.DisableIPv6 = _options.DisableIPv6;
+        request.WithDebug = _options.WithDebug;
+        request.WithDefaultCookieJar = _options.WithDefaultCookieJar;
+        request.WithoutCookieJar = _options.WithoutCookieJar;
+        request.FollowRedirects = _options.FollowRedirects;
+        request.CatchPanics = _options.CatchPanics;
+        request.TimeoutMilliseconds = (int)_options.Timeout.TotalMilliseconds;
+
+        // Apply browser type
+        request.BrowserType = _options.BrowserType;
+
+        // Apply OR logic for certain flags - either request or client can enable
+        request.ForceHttp1 = request.ForceHttp1 || _options.ForceHttp1;
+        request.WithRandomTlsExtensionOrder = request.WithRandomTlsExtensionOrder || _options.WithRandomTlsExtensionOrder;
+
+        // Custom TLS client overrides browser type
+        if (request.CustomHttp2Client != null)
         {
-            req.BrowserType = _options.BrowserType;
+            request.BrowserType = default;
         }
+    }
 
-        // OR logic - either can force HTTP/1
-        req.ForceHttp1 = request.ForceHttp1 || _options.ForceHttp1;
-        req.CatchPanics = _options.CatchPanics;
-        req.WithRandomTLSExtensionOrder = request.WithRandomTLSExtensionOrder || _options.WithRandomTlsExtensionOrder;
-
-        // Use client timeout if request doesn't specify one
-        if (!req.TimeoutMilliseconds.HasValue)
+    /// <summary>
+    /// Mixes our default headers with the request's headers.
+    /// Request headers win if there's a conflict.
+    /// </summary>
+    private void SetHeaders(HttpRequest request)
+    {
+        foreach (var defaultHeader in _options.DefaultHeaders)
         {
-            req.TimeoutMilliseconds = (int)_options.Timeout.TotalMilliseconds;
-        }
-
-        // Header merging is tricky - we want defaults but request headers should override
-        foreach (KeyValuePair<string, List<string>> pair in _options.DefaultHeaders)
-        {
-            if (!req.DefaultHeaders.ContainsKey(pair.Key))
+            // Add to DefaultHeaders if not already present
+            if (!request.DefaultHeaders.ContainsKey(defaultHeader.Key))
             {
-                req.DefaultHeaders[pair.Key] = [.. pair.Value];
+                request.DefaultHeaders[defaultHeader.Key] = [.. defaultHeader.Value];
             }
 
-            if (!req.Headers.ContainsKey(pair.Key) && pair.Value.Count > 0)
+            // Add to Headers if not already present and has values
+            if (!request.Headers.ContainsKey(defaultHeader.Key) && defaultHeader.Value.Count > 0)
             {
-                req.Headers[pair.Key] = pair.Value[0];
+                request.Headers[defaultHeader.Key] = defaultHeader.Value[0];
             }
         }
-
-        // Custom TLS client and browser type are mutually exclusive
-        if (req.CustomHttp2Client != null)
-        {
-            req.BrowserType = default;
-        }
-
-        return req;
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
 ﻿using Http2Client.Core.Enums;
+using Http2Client.Utilities;
 
 using System;
 using System.ComponentModel;
@@ -6,7 +7,7 @@ using System.ComponentModel;
 namespace Http2Client.Extensions;
 
 /// <summary>
-/// Extension methods for BrowserType enum string conversion.
+/// Extension methods for <see cref="BrowserType" /> enum string conversion.
 /// </summary>
 public static class BrowserTypeExtension
 {
@@ -23,14 +24,11 @@ public static class BrowserTypeExtension
     /// <summary>
     /// Parses string to enum. Handles names and descriptions.
     /// </summary>
-    public static BrowserType FromString(string value)
+    public static BrowserType FromString(string? value)
     {
-        if (string.IsNullOrEmpty(value))
-        {
-            throw new ArgumentException("Value cannot be null or empty", nameof(value));
-        }
+        ThrowException.NullOrEmpty(value);
 
-        if (Enum.TryParse<BrowserType>(value.Replace("_", "").Replace("-", ""), true, out var result))
+        if (Enum.TryParse<BrowserType>(value!.Replace("_", "").Replace("-", ""), true, out var result))
         {
             // Verify the description matches
             if (result.GetValue().Equals(value, StringComparison.OrdinalIgnoreCase))
@@ -40,11 +38,11 @@ public static class BrowserTypeExtension
         }
 
         // Fallback: search by description (rare case)
-        foreach (BrowserType identifier in (BrowserType[])Enum.GetValues(typeof(BrowserType)))
+        foreach (var type in (BrowserType[])Enum.GetValues(typeof(BrowserType)))
         {
-            if (identifier.GetValue().Equals(value, StringComparison.OrdinalIgnoreCase))
+            if (type.GetValue().Equals(value, StringComparison.OrdinalIgnoreCase))
             {
-                return identifier;
+                return type;
             }
         }
 

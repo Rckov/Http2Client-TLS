@@ -5,7 +5,7 @@
 
 # Http2Client
 
-Http2Client is a fork of [TlsClient.NET](https://github.com/ErenKrt/TlsClient.NET), providing customizable HTTP/2 clients with TLS fingerprinting capabilities. Based on [bogdanfinn/tls-client](https://github.com/bogdanfinn/tls-client/), it allows you to mimic specific browser fingerprints and control detailed aspects of TLS behavior in your .NET applications.
+Http2Client provides customizable HTTP/2 clients with TLS fingerprinting capabilities. Based on [bogdanfinn/tls-client](https://github.com/bogdanfinn/tls-client/), it allows you to mimic specific browser fingerprints and control detailed aspects of TLS behavior in your .NET applications.
 
 ## Installation
 
@@ -92,7 +92,7 @@ var cookies = client.GetCookies("https://example.com");
 // Add cookies to session
 var newCookies = new List<ClientCookie> 
 {
-    new ClientCookie { Name = "session", Value = "abc123" }
+    new ClientCookie("session", "abc123")
 };
 client.AddCookies("https://example.com", newCookies);
 
@@ -125,30 +125,35 @@ using var client = new HttpClientBuilder()
 | `WithProxy(string, bool)` | Configures proxy URL and rotation setting. |
 | `WithInsecureSkipVerify(bool)` | Skips SSL certificate verification. |
 | `WithRandomTlsExtensions(bool)` | Randomizes TLS extension order. |
-| `WithCookies(bool)` | Enables or disables automatic cookie handling. |
+| `WithCookies(bool)` | Enables automatic cookie handling. |
+| `WithoutCookieJar(bool)` | Disables all cookie handling. |
 | `WithDebug(bool)` | Enables debug logging. |
-| `DisableIPv4(bool)` | Disables IPv4 connections. |
-| `DisableIPv6(bool)` | Disables IPv6 connections. |
-| `FollowRedirects(bool)` | Enables automatic redirect following. |
-| `ForceHttp1(bool)` | Forces HTTP/1.1 instead of HTTP/2. |
-| `SetHeader(string, string)` | Sets a default header. |
+| `WithDisableIPv4(bool)` | Disables IPv4 connections. |
+| `WithDisableIPv6(bool)` | Disables IPv6 connections. |
+| `WithFollowRedirects(bool)` | Enables automatic redirect following. |
+| `WithForceHttp1(bool)` | Forces HTTP/1.1 instead of HTTP/2. |
+| `WithHeader(string, string)` | Sets a default header. |
 | `WithHeaders(Dictionary<string, string>)` | Sets multiple default headers. |
+| `WithHeaderOrder(params string[])` | Sets the order of HTTP headers. |
+| `WithSessionId(Guid)` | Sets the session ID for this client. |
+| `WithCustomHttp2Client(CustomHttp2Client)` | Uses custom TLS fingerprint. |
+| `WithCatchPanics(bool)` | Catches native library panics. |
 
 ### Advanced Example
 
 ```csharp
 using var client = new HttpClientBuilder()
     .WithLibraryPath("tls-client-windows-64-1.11.0.dll")
-    .WithBrowserType(BrowserType.Firefox133)
+    .WithBrowserType(BrowserType.Firefox132)
     .WithUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
     .WithProxy("http://127.0.0.1:8888", isRotating: true)
     .WithTimeout(TimeSpan.FromSeconds(30))
     .WithDebug(true)
-    .FollowRedirects(true)
+    .WithFollowRedirects(true)
     .WithInsecureSkipVerify(false)
-    .DisableIPv6(true)
-    .SetHeader("X-Custom-Header", "MyValue")
-    .WithCookies(true)
+    .WithDisableIPv6(true)
+    .WithHeader("X-Custom-Header", "MyValue")
+    .WithCookies()
     .Build();
 ```
 
@@ -163,7 +168,7 @@ For more complex request configuration, use the fluent `HttpRequestBuilder`:
 ```csharp
 var request = new HttpRequestBuilder()
     .WithUrl("https://api.example.com/data")
-    .WithMethod("POST")
+    .WithMethod(HttpMethod.Post)
     .WithJsonBody(new { name = "John", age = 30 })
     .WithBrowserType(BrowserType.Chrome133)
     .WithTimeout(TimeSpan.FromSeconds(30))
@@ -201,9 +206,12 @@ var request = new HttpRequest
 | `Headers` | Dictionary of HTTP headers. |
 | `BrowserType` | Browser fingerprint to use. |
 | `TimeoutMilliseconds` | Request timeout in milliseconds. |
+| `TimeoutSeconds` | Request timeout in seconds. |
 | `ProxyUrl` | Proxy server URL. |
 | `InsecureSkipVerify` | Skip SSL certificate verification. |
 | `FollowRedirects` | Follow HTTP redirects automatically. |
+| `RequestCookies` | List of cookies for this request. |
+| `WithDebug` | Enable debug logging for this request. |
 
 ## Features
 

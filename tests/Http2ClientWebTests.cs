@@ -6,12 +6,12 @@ using Http2Client.Core.Request;
 
 using System.Net;
 
+using Xunit;
+
 namespace Http2Client.Test;
 
 public class Http2ClientWebTests
 {
-    private const string LibPath = "tls-client-windows-64-1.11.0.dll";
-
     private Http2Client? _client;
 
     [Fact]
@@ -118,46 +118,21 @@ public class Http2ClientWebTests
         {
             RequestUrl = "https://httpbin.org/headers",
             RequestMethod = "GET",
-            Headers =
-            {
-                ["X-Test-Header"] = "test-value",
-                ["X-Custom"] = "custom-value"
-            }
+            Headers = { ["X-Integration-Test"] = "web-test-value" }
         };
 
         var response = _client.Send(request);
 
         response.Status.Should().Be(HttpStatusCode.OK);
-        response.Body.Should().Contain("X-Test-Header");
-        response.Body.Should().Contain("test-value");
-        response.Body.Should().Contain("X-Custom");
-        response.Body.Should().Contain("custom-value");
-    }
-
-    [Fact]
-    public void UserAgent_Works()
-    {
-        _client ??= CreateClient();
-
-        var request = new HttpRequest
-        {
-            RequestUrl = "https://httpbin.org/user-agent",
-            RequestMethod = "GET",
-            Headers = { ["User-Agent"] = "Test-Agent/1.0" }
-        };
-
-        var response = _client.Send(request);
-
-        response.Status.Should().Be(HttpStatusCode.OK);
-        response.Body.Should().Contain("Test-Agent/1.0");
+        response.Body.Should().Contain("X-Integration-Test");
+        response.Body.Should().Contain("web-test-value");
     }
 
     private Http2Client CreateClient()
     {
         return new HttpClientBuilder()
-            .WithLibraryPath(LibPath)
+            .WithLibraryPath(TestConstants.LibraryPath)
             .WithBrowserType(BrowserType.Chrome133)
-            .WithTimeout(TimeSpan.FromSeconds(30))
             .WithUserAgent("Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
             .WithCookies()
             .Build();

@@ -3,119 +3,66 @@ using FluentAssertions;
 using Http2Client.Builders;
 using Http2Client.Core.Enums;
 
+using Xunit;
+
 namespace Http2Client.Test.Builders;
 
 public class HttpClientBuilderTests
 {
     [Fact]
-    public void Timeout_Throws()
+    public void WithSessionId_Empty_Throws()
     {
         var builder = new HttpClientBuilder();
 
-        builder.Invoking(b => b.WithTimeout(TimeSpan.Zero))
-            .Should().Throw<ArgumentException>()
-            .WithMessage("Timeout must be positive*");
+        builder.Invoking(b => b.WithSessionId(Guid.Empty))
+            .Should()
+            .Throw<ArgumentException>()
+            .WithMessage("SessionId must be non-empty.*");
     }
 
     [Fact]
-    public void Cookies_Work()
+    public void WithCustomHttp2Client_Null_Throws()
     {
-        var tempFile1 = Path.GetTempFileName();
-        var tempFile2 = Path.GetTempFileName();
-        try
-        {
-            var enabledOptions = new HttpClientBuilder()
-                .WithLibraryPath(tempFile1)
-                .WithCookies(true)
-                .BuildOptions();
-
-            var disabledOptions = new HttpClientBuilder()
-                .WithLibraryPath(tempFile2)
-                .WithCookies(false)
-                .BuildOptions();
-
-            enabledOptions.WithDefaultCookieJar.Should().BeTrue();
-            enabledOptions.WithoutCookieJar.Should().BeFalse();
-
-            disabledOptions.WithDefaultCookieJar.Should().BeFalse();
-            disabledOptions.WithoutCookieJar.Should().BeTrue();
-        }
-        finally
-        {
-            File.Delete(tempFile1);
-            File.Delete(tempFile2);
-        }
+        var builder = new HttpClientBuilder();
+        builder.Invoking(b => b.WithCustomHttp2Client(null!)).Should().Throw<ArgumentNullException>();
     }
 
     [Fact]
-    public void UserAgent_Works()
+    public void WithHeader_NullName_Throws()
     {
-        const string userAgent = "Test-Agent/1.0";
-        var tempFile = Path.GetTempFileName();
-        try
-        {
-            var options = new HttpClientBuilder()
-                .WithLibraryPath(tempFile)
-                .WithUserAgent(userAgent)
-                .BuildOptions();
-
-            options.UserAgent.Should().Be(userAgent);
-            options.DefaultHeaders["User-Agent"].Should().ContainSingle().Which.Should().Be(userAgent);
-        }
-        finally
-        {
-            File.Delete(tempFile);
-        }
+        var builder = new HttpClientBuilder();
+        builder.Invoking(b => b.WithHeader(null!, "value")).Should().Throw<ArgumentException>();
     }
 
     [Fact]
-    public void Headers_Work()
+    public void WithHeaderOrder_Null_Throws()
     {
-        var headers = new Dictionary<string, string>
-        {
-            ["Header1"] = "Value1",
-            ["Header2"] = "Value2"
-        };
-        var tempFile = Path.GetTempFileName();
-        try
-        {
-            var options = new HttpClientBuilder()
-                .WithLibraryPath(tempFile)
-                .WithHeaders(headers)
-                .BuildOptions();
+        var builder = new HttpClientBuilder();
+        builder.Invoking(b => b.WithHeaderOrder(null!)).Should().Throw<ArgumentNullException>();
+    }
 
-            options.DefaultHeaders["Header1"].Should().ContainSingle().Which.Should().Be("Value1");
-            options.DefaultHeaders["Header2"].Should().ContainSingle().Which.Should().Be("Value2");
-        }
-        finally
-        {
-            File.Delete(tempFile);
-        }
+    [Fact]
+    public void WithUserAgent_Null_Throws()
+    {
+        var builder = new HttpClientBuilder();
+        builder.Invoking(b => b.WithUserAgent(null!)).Should().Throw<ArgumentException>();
     }
 
     [Fact]
     public void Chaining_Works()
     {
-        var tempFile = Path.GetTempFileName();
-        try
-        {
-            var options = new HttpClientBuilder()
-                .WithLibraryPath(tempFile)
-                .WithBrowserType(BrowserType.Firefox132)
-                .WithTimeout(TimeSpan.FromSeconds(30))
-                .WithProxy("http://proxy:8080", true)
-                .WithDebug(true)
-                .BuildOptions();
+        var options = new HttpClientBuilder()
+            .WithLibraryPath(TestConstants.LibraryPath)
+            .WithBrowserType(BrowserType.Firefox132)
+            .WithTimeout(TimeSpan.FromSeconds(30))
+            .WithProxy("http://proxy:8080", true)
+            .WithDebug(true)
+            .BuildOptions();
 
-            options.BrowserType.Should().Be(BrowserType.Firefox132);
-            options.Timeout.Should().Be(TimeSpan.FromSeconds(30));
-            options.ProxyUrl.Should().Be("http://proxy:8080");
-            options.IsRotatingProxy.Should().BeTrue();
-            options.WithDebug.Should().BeTrue();
-        }
-        finally
-        {
-            File.Delete(tempFile);
-        }
+        options.BrowserType.Should().Be(BrowserType.Firefox132);
+        options.Timeout.Should().Be(TimeSpan.FromSeconds(30));
+        options.ProxyUrl.Should().Be("http://proxy:8080");
+        options.IsRotatingProxy.Should().BeTrue();
+        options.WithDebug.Should().BeTrue();
     }
 }

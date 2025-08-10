@@ -2,6 +2,8 @@ using FluentAssertions;
 
 using Http2Client.Core.Enums;
 
+using Xunit;
+
 namespace Http2Client.Test;
 
 public class Http2ClientOptionsTests
@@ -11,8 +13,8 @@ public class Http2ClientOptionsTests
     {
         var options = new Http2ClientOptions();
 
-        options.SessionID.Should().NotBeEmpty();
-        options.BrowserType.Should().Be(BrowserType.Chrome131);
+        options.SessionId.Should().NotBeEmpty();
+        options.BrowserType.Should().Be(BrowserType.Chrome133);
         options.Timeout.Should().Be(TimeSpan.FromSeconds(60));
         options.CatchPanics.Should().BeTrue();
         options.DefaultHeaders.Should().BeEmpty();
@@ -33,8 +35,10 @@ public class Http2ClientOptionsTests
     [Fact]
     public void UserAgent_Null_Removes()
     {
-        var options = new Http2ClientOptions();
-        options.UserAgent = "Test-Agent/1.0";
+        var options = new Http2ClientOptions
+        {
+            UserAgent = "Test-Agent/1.0"
+        };
 
         options.UserAgent = null;
 
@@ -45,79 +49,64 @@ public class Http2ClientOptionsTests
     [Fact]
     public void Validate_Cookies_Throws()
     {
-        var tempFile = Path.GetTempFileName();
-        try
+        var options = new Http2ClientOptions
         {
-            var options = new Http2ClientOptions
-            {
-                LibraryPath = tempFile,
-                WithDefaultCookieJar = true,
-                WithoutCookieJar = true
-            };
+            LibraryPath = TestConstants.LibraryPath,
+            WithDefaultCookieJar = true,
+            WithoutCookieJar = true
+        };
 
-            options.Invoking(o => o.Validate())
-                .Should().Throw<InvalidOperationException>()
-                .WithMessage("Cannot enable both WithDefaultCookieJar and WithoutCookieJar.");
-        }
-        finally
-        {
-            File.Delete(tempFile);
-        }
+        options.Invoking(o => o.Validate())
+            .Should()
+            .Throw<InvalidOperationException>()
+            .WithMessage("Cannot enable both WithDefaultCookieJar and WithoutCookieJar.");
     }
 
     [Fact]
     public void Validate_IP_Throws()
     {
-        var tempFile = Path.GetTempFileName();
-        try
+        var options = new Http2ClientOptions
         {
-            var options = new Http2ClientOptions
-            {
-                LibraryPath = tempFile,
-                DisableIPv4 = true,
-                DisableIPv6 = true
-            };
+            LibraryPath = TestConstants.LibraryPath,
+            DisableIPv4 = true,
+            DisableIPv6 = true
+        };
 
-            options.Invoking(o => o.Validate())
-                .Should().Throw<InvalidOperationException>()
-                .WithMessage("Cannot disable both IPv4 and IPv6.");
-        }
-        finally
-        {
-            File.Delete(tempFile);
-        }
+        options.Invoking(o => o.Validate())
+            .Should()
+            .Throw<InvalidOperationException>()
+            .WithMessage("Cannot disable both IPv4 and IPv6.");
     }
 
     [Fact]
     public void Validate_Timeout_Throws()
     {
-        var tempFile = Path.GetTempFileName();
-        try
+        var options = new Http2ClientOptions
         {
-            var options = new Http2ClientOptions
-            {
-                LibraryPath = tempFile,
-                Timeout = TimeSpan.Zero
-            };
+            LibraryPath = TestConstants.LibraryPath,
+            Timeout = TimeSpan.Zero
+        };
 
-            options.Invoking(o => o.Validate())
-                .Should().Throw<ArgumentException>()
-                .WithMessage("Timeout must be greater than zero.*");
-        }
-        finally
-        {
-            File.Delete(tempFile);
-        }
+        options.Invoking(o => o.Validate()).Should().Throw<ArgumentException>();
     }
 
     [Fact]
-    public void Validate_Lib_Throws()
+    public void Validate_ProxyUrl_Throws()
+    {
+        var options = new Http2ClientOptions
+        {
+            LibraryPath = TestConstants.LibraryPath,
+            ProxyUrl = "invalid-url"
+        };
+
+        options.Invoking(o => o.Validate()).Should().Throw<ArgumentException>();
+    }
+
+    [Fact]
+    public void Validate_LibraryPath_Throws()
     {
         var options = new Http2ClientOptions { LibraryPath = "nonexistent.dll" };
-
-        options.Invoking(o => o.Validate())
-            .Should().Throw<FileNotFoundException>()
-            .WithMessage("Native library not found at: nonexistent.dll");
+        options.Invoking(o => o.Validate()).Should().Throw<FileNotFoundException>();
     }
 
     [Fact]

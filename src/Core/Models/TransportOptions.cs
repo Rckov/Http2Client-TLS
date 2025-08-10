@@ -15,6 +15,7 @@ public class TransportOptions
     /// Idle connection timeout in milliseconds.
     /// </summary>
     [JsonPropertyName("idleConnTimeout")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public long? IdleConnTimeout { get; set; }
 
     /// <summary>

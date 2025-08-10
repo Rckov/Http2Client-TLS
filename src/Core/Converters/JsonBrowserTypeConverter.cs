@@ -8,12 +8,12 @@ using System.Text.Json.Serialization;
 namespace Http2Client.Core.Converters;
 
 /// <summary>
-/// JSON converter for BrowserType enum.
+/// JSON converter for <see cref="BrowserType" /> enum.
 /// </summary>
 internal class JsonBrowserTypeConverter : JsonConverter<BrowserType>
 {
     /// <summary>
-    /// Reads BrowserType from JSON.
+    /// Reads <see cref="BrowserType" /> from JSON.
     /// </summary>
     public override BrowserType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
@@ -24,12 +24,12 @@ internal class JsonBrowserTypeConverter : JsonConverter<BrowserType>
                 ? default
                 : BrowserTypeExtension.FromString(reader.GetString()),
 
-            _ => throw new JsonException($"Cannot convert {reader.TokenType} to TlsClientIdentifier")
+            _ => throw new JsonException($"Cannot convert {reader.TokenType} to BrowserType")
         };
     }
 
     /// <summary>
-    /// Writes BrowserType to JSON.
+    /// Writes <see cref="BrowserType" /> to JSON.
     /// </summary>
     public override void Write(Utf8JsonWriter writer, BrowserType value, JsonSerializerOptions options)
     {

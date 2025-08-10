@@ -21,7 +21,7 @@ public class PriorityFrame
     /// Stream ID for this priority.
     /// </summary>
     [JsonPropertyName("streamID")]
-    public uint StreamID { get; set; }
+    public uint StreamId { get; set; }
 }
 
 /// <summary>

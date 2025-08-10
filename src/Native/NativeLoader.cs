@@ -13,7 +13,7 @@ internal static class NativeLoader
     /// <summary>
     /// Loads native library and returns handle for function calls.
     /// </summary>
-    public static IntPtr LoadLibrary(string path)
+    public static IntPtr LoadLibrary(string? path)
     {
         if (PlatformSupport.IsLinux) return Linux.LoadLibrary(path);
         if (PlatformSupport.IsMacOS) return MacOS.LoadLibrary(path);
@@ -27,7 +27,7 @@ internal static class NativeLoader
     /// </summary>
     /// <param name="handle">Library handle</param>
     /// <param name="name">Function name</param>
-    public static IntPtr GetProcAddress(nint handle, string name)
+    public static IntPtr GetProcAddress(IntPtr handle, string name)
     {
         if (PlatformSupport.IsLinux) return Linux.GetProcAddress(handle, name);
         if (PlatformSupport.IsMacOS) return MacOS.GetProcAddress(handle, name);
@@ -40,7 +40,7 @@ internal static class NativeLoader
     /// Unloads library and frees memory.
     /// </summary>
     /// <param name="handle">Library handle</param>
-    public static bool FreeLibrary(nint handle)
+    public static bool FreeLibrary(IntPtr handle)
     {
         // Linux and macOS return 0 on success, non-zero on failure
         if (PlatformSupport.IsLinux) return Linux.FreeLibrary(handle) == 0;
@@ -56,14 +56,18 @@ internal static class NativeLoader
     private static class Windows
     {
         [DllImport("kernel32.dll", ExactSpelling = true, SetLastError = true, EntryPoint = "LoadLibraryW")]
-        public static extern IntPtr LoadLibrary([In][MarshalAs(UnmanagedType.LPWStr)] string path);
+        public static extern IntPtr LoadLibrary(
+            [In][MarshalAs(UnmanagedType.LPWStr)] string? path);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern IntPtr GetProcAddress([In] IntPtr hModule, [In] string procName);
+        public static extern IntPtr GetProcAddress(
+            [In] IntPtr hModule,
+            [In] string procName);
 
         [DllImport("kernel32.dll", SetLastError = true, EntryPoint = "FreeLibrary")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool FreeLibrary([In] IntPtr hLibrary);
+        public static extern bool FreeLibrary(
+            [In] IntPtr hLibrary);
     }
 
     /// <summary>
@@ -74,27 +78,23 @@ internal static class NativeLoader
         [Flags]
         public enum LoadLibraryFlags
         {
-            None = 0,
-            Lazy = 0x0001,
             Now = 0x0002,
-            BindingMask = 0x0003,
-            NoLoad = 0x0004,
-            DeepBind = 0x0008,
-            Local = None,
-            Global = 0x0100,
-            NoDelete = 0x1000
+            Global = 0x0100
         }
 
         [DllImport("libdl.so.2", EntryPoint = "dlopen")]
         public static extern IntPtr LoadLibrary(
-            [In][MarshalAs(UnmanagedType.LPStr)] string path, 
-            [In]LoadLibraryFlags flags = LoadLibraryFlags.Now | LoadLibraryFlags.Global);
-
-        [DllImport("libdl.so.2", EntryPoint = "dlclose")]
-        public static extern int FreeLibrary([In] IntPtr hLibrary);
+            [In][MarshalAs(UnmanagedType.LPStr)] string? path,
+            [In] LoadLibraryFlags flags = LoadLibraryFlags.Now | LoadLibraryFlags.Global);
 
         [DllImport("libdl.so.2", EntryPoint = "dlsym")]
-        public static extern IntPtr GetProcAddress([In] IntPtr handle, [In] string symbol);
+        public static extern IntPtr GetProcAddress(
+            [In] IntPtr handle,
+            [In] string symbol);
+
+        [DllImport("libdl.so.2", EntryPoint = "dlclose")]
+        public static extern int FreeLibrary(
+            [In] IntPtr hLibrary);
     }
 
     /// <summary>
@@ -105,24 +105,22 @@ internal static class NativeLoader
         [Flags]
         public enum LoadLibraryFlags
         {
-            None = 0,
-            Lazy = 0x01,
             Now = 0x02,
-            Local = 0x04,
-            Global = 0x08,
-            NoLoad = 0x10,
-            NoDelete = 0x80
+            Global = 0x08
         }
 
         [DllImport("libdl.dylib", EntryPoint = "dlopen")]
         public static extern IntPtr LoadLibrary(
-            [In][MarshalAs(UnmanagedType.LPStr)] string path, 
-            [In]LoadLibraryFlags flags = LoadLibraryFlags.Now | LoadLibraryFlags.Global);
-
-        [DllImport("libdl.dylib", EntryPoint = "dlclose")]
-        public static extern int FreeLibrary([In] IntPtr hLibrary);
+            [In][MarshalAs(UnmanagedType.LPStr)] string? path,
+            [In] LoadLibraryFlags flags = LoadLibraryFlags.Now | LoadLibraryFlags.Global);
 
         [DllImport("libdl.dylib", EntryPoint = "dlsym")]
-        public static extern IntPtr GetProcAddress([In] IntPtr handle, [In] string symbol);
+        public static extern IntPtr GetProcAddress(
+            [In] IntPtr handle,
+            [In] string symbol);
+
+        [DllImport("libdl.dylib", EntryPoint = "dlclose")]
+        public static extern int FreeLibrary(
+            [In] IntPtr hLibrary);
     }
 }

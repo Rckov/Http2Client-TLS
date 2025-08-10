@@ -6,11 +6,11 @@
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;x64</Platforms>
     <PackageId>Http2Client</PackageId>
-    <Version>1.0.3</Version>
+    <Version>1.1.3</Version>
     <Authors>Rckov</Authors>
     <Company>Rckov</Company>
     <Product>Http2Client</Product>
-    <Description>HTTP/2 client with TLS fingerprinting capabilities. Fork of TlsClient.NET with redesigned architecture for .NET applications.</Description>
+    <Description>HTTP client with configurable TLS fingerprints and HTTP/2 support. .NET wrapper for bogdanfinn/tls-client.</Description>
     <PackageTags>http2;tls;fingerprinting;browser;client;proxy;cookies</PackageTags>
     <PackageProjectUrl>https://github.com/Rckov/Http2Client-TLS</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Rckov/Http2Client-TLS</RepositoryUrl>

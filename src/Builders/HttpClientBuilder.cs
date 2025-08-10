@@ -1,5 +1,6 @@
 ﻿using Http2Client.Core.Enums;
 using Http2Client.Core.Models;
+using Http2Client.Utilities;
 
 using System;
 using System.Collections.Generic;
@@ -7,41 +8,69 @@ using System.Collections.Generic;
 namespace Http2Client.Builders;
 
 /// <summary>
-/// Builder for Http2Client instances. Chain methods and call Build().
+/// Builder for <see cref="Http2Client" /> instances. Chain methods and call Build().
 /// </summary>
 public class HttpClientBuilder
 {
     private readonly Http2ClientOptions _options = new();
 
     /// <summary>
-    /// Sets native library path. Auto-detected if not set.
+    /// Uses custom TLS fingerprint instead of browser preset.
     /// </summary>
-    public HttpClientBuilder WithLibraryPath(string libraryPath)
+    public HttpClientBuilder WithCustomHttp2Client(CustomHttp2Client customHttp2Client)
     {
-        _options.LibraryPath = libraryPath;
+        ThrowException.Null(customHttp2Client, nameof(customHttp2Client));
+
+        _options.CustomHttp2Client = customHttp2Client;
         return this;
     }
 
     /// <summary>
-    /// Request timeout. Default is 60 seconds.
+    /// Sets default header sent with every request.
     /// </summary>
-    public HttpClientBuilder WithTimeout(TimeSpan timeout)
+    public HttpClientBuilder WithHeader(string name, string value)
     {
-        if (timeout <= TimeSpan.Zero)
+        ThrowException.NullOrEmpty(name, nameof(name));
+        ThrowException.Null(value);
+
+        _options.DefaultHeaders[name] = [value];
+        return this;
+    }
+
+    /// <summary>
+    /// Sets multiple default headers at once.
+    /// </summary>
+    public HttpClientBuilder WithHeaders(Dictionary<string, string> headers)
+    {
+        foreach (var header in headers)
         {
-            throw new ArgumentException("Timeout must be positive", nameof(timeout));
+            WithHeader(header.Key, header.Value);
         }
 
-        _options.Timeout = timeout;
         return this;
     }
 
     /// <summary>
-    /// Enables debug logging.
+    /// Uses proxy. Supports HTTP, HTTPS, SOCKS5.
     /// </summary>
-    public HttpClientBuilder WithDebug(bool enable = true)
+    public HttpClientBuilder WithProxy(string? proxyUrl, bool isRotating = false)
     {
-        _options.WithDebug = enable;
+        _options.ProxyUrl = proxyUrl;
+        _options.IsRotatingProxy = isRotating;
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the Session ID for this client. Auto-generated if not set.
+    /// </summary>
+    public HttpClientBuilder WithSessionId(Guid sessionId)
+    {
+        if (sessionId == Guid.Empty)
+        {
+            throw new ArgumentException("SessionId must be non-empty.", nameof(sessionId));
+        }
+
+        _options.SessionId = sessionId;
         return this;
     }
 
@@ -55,11 +84,49 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Uses custom TLS fingerprint instead of browser preset.
+    /// Sets the order of HTTP headers. Some servers validate header order.
     /// </summary>
-    public HttpClientBuilder WithCustomHttp2Client(CustomHttp2Client customHttp2Client)
+    public HttpClientBuilder WithHeaderOrder(params string[] headerOrder)
     {
-        _options.CustomHttp2Client = customHttp2Client;
+        ThrowException.Null(headerOrder, nameof(headerOrder));
+
+        _options.HeaderOrder = [.. headerOrder];
+        return this;
+    }
+
+    /// <summary>
+    /// Request timeout. Default is 60 seconds.
+    /// </summary>
+    public HttpClientBuilder WithTimeout(TimeSpan timeout)
+    {
+        _options.Timeout = timeout;
+        return this;
+    }
+
+    /// <summary>
+    /// Catches native library panics.
+    /// </summary>
+    public HttpClientBuilder WithCatchPanics(bool enable = true)
+    {
+        _options.CatchPanics = enable;
+        return this;
+    }
+
+    /// <summary>
+    /// Enables automatic redirect following.
+    /// </summary>
+    public HttpClientBuilder WithFollowRedirects(bool follow = true)
+    {
+        _options.FollowRedirects = follow;
+        return this;
+    }
+
+    /// <summary>
+    /// Forces HTTP/1.1 over HTTP/2.
+    /// </summary>
+    public HttpClientBuilder WithForceHttp1(bool force = true)
+    {
+        _options.ForceHttp1 = force;
         return this;
     }
 
@@ -73,59 +140,29 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Randomizes TLS extension order.
-    /// </summary>
-    public HttpClientBuilder WithRandomTlsExtensions(bool enable = true)
-    {
-        _options.WithRandomTlsExtensionOrder = enable;
-        return this;
-    }
-
-    /// <summary>
-    /// Uses proxy. Supports HTTP, HTTPS, SOCKS5.
-    /// </summary>
-    public HttpClientBuilder WithProxy(string proxyUrl, bool isRotating = false)
-    {
-        _options.ProxyUrl = proxyUrl;
-
-        // Helps with connection pooling
-        _options.IsRotatingProxy = isRotating;
-        return this;
-    }
-
-    /// <summary>
-    /// Disables IPv4 connections.
-    /// </summary>
-    public HttpClientBuilder DisableIPv4(bool disable = true)
-    {
-        _options.DisableIPv4 = disable;
-        return this;
-    }
-
-    /// <summary>
     /// Disables IPv6 connections.
     /// </summary>
-    public HttpClientBuilder DisableIPv6(bool disable = true)
+    public HttpClientBuilder WithDisableIPv6(bool disable = true)
     {
         _options.DisableIPv6 = disable;
         return this;
     }
 
     /// <summary>
-    /// Enables automatic redirect following.
+    /// Disables IPv4 connections.
     /// </summary>
-    public HttpClientBuilder FollowRedirects(bool follow = true)
+    public HttpClientBuilder WithDisableIPv4(bool disable = true)
     {
-        _options.FollowRedirects = follow;
+        _options.DisableIPv4 = disable;
         return this;
     }
 
     /// <summary>
-    /// Forces HTTP/1.1 over HTTP/2.
+    /// Enables debug logging.
     /// </summary>
-    public HttpClientBuilder ForceHttp1(bool force = true)
+    public HttpClientBuilder WithDebug(bool enable = true)
     {
-        _options.ForceHttp1 = force;
+        _options.WithDebug = enable;
         return this;
     }
 
@@ -135,18 +172,37 @@ public class HttpClientBuilder
     public HttpClientBuilder WithCookies(bool enabled = true)
     {
         _options.WithDefaultCookieJar = enabled;
-
-        // These are mutually exclusive
         _options.WithoutCookieJar = !enabled;
         return this;
     }
 
     /// <summary>
-    /// Catches native library panics.
+    /// Disable all cookie handling.
     /// </summary>
-    public HttpClientBuilder CatchPanics(bool enable = true)
+    public HttpClientBuilder WithoutCookieJar(bool enabled = true)
     {
-        _options.CatchPanics = enable;
+        _options.WithDefaultCookieJar = !enabled;
+        _options.WithoutCookieJar = enabled;
+        return this;
+    }
+
+    /// <summary>
+    /// Randomizes TLS extension order.
+    /// </summary>
+    public HttpClientBuilder WithRandomTlsExtensions(bool enable = true)
+    {
+        _options.WithRandomTlsExtensionOrder = enable;
+        return this;
+    }
+
+    /// <summary>
+    /// Sets native library path. Auto-detected if not set.
+    /// </summary>
+    public HttpClientBuilder WithLibraryPath(string libraryPath)
+    {
+        ThrowException.FileNotExists(libraryPath, nameof(libraryPath));
+
+        _options.LibraryPath = libraryPath;
         return this;
     }
 
@@ -155,59 +211,10 @@ public class HttpClientBuilder
     /// </summary>
     public HttpClientBuilder WithUserAgent(string userAgent)
     {
+        ThrowException.NullOrEmpty(userAgent, nameof(userAgent));
+
         _options.UserAgent = userAgent;
         return this;
-    }
-
-    /// <summary>
-    /// Sets default header sent with every request.
-    /// </summary>
-    public HttpClientBuilder SetHeader(string name, string value)
-    {
-        // Replaces existing value
-        _options.DefaultHeaders[name] = [value];
-        return this;
-    }
-
-    /// <summary>
-    /// Sets multiple default headers at once.
-    /// </summary>
-    public HttpClientBuilder WithHeaders(Dictionary<string, string> headers)
-    {
-        foreach (var header in headers)
-        {
-            SetHeader(header.Key, header.Value);
-        }
-
-        return this;
-    }
-
-    /// <summary>
-    /// Builds options without creating client.
-    /// </summary>
-    public Http2ClientOptions BuildOptions()
-    {
-        ValidateBuilder();
-        _options.Validate();
-
-        // Clone to prevent modifications
-        return _options.Clone();
-    }
-
-    /// <summary>
-    /// Validates builder for conflicting settings.
-    /// </summary>
-    private void ValidateBuilder()
-    {
-        if (_options.WithDefaultCookieJar && _options.WithoutCookieJar)
-        {
-            throw new InvalidOperationException("Cannot enable both WithDefaultCookieJar and WithoutCookieJar");
-        }
-
-        if (_options.DisableIPv4 && _options.DisableIPv6)
-        {
-            throw new InvalidOperationException("Cannot disable both IPv4 and IPv6");
-        }
     }
 
     /// <summary>
@@ -216,5 +223,16 @@ public class HttpClientBuilder
     public Http2Client Build()
     {
         return new Http2Client(BuildOptions());
+    }
+
+    /// <summary>
+    /// Builds options without creating client.
+    /// </summary>
+    public Http2ClientOptions BuildOptions()
+    {
+        _options.Validate();
+
+        // Clone to prevent modifications
+        return _options.Clone();
     }
 }

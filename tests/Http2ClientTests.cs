@@ -1,6 +1,6 @@
 using FluentAssertions;
 
-using Http2Client.Core.Enums;
+using Xunit;
 
 namespace Http2Client.Test;
 
@@ -10,46 +10,39 @@ public class Http2ClientTests
     public void Ctor_Null_Throws()
     {
         var action = () => new Http2Client(null!);
-
         action.Should().Throw<ArgumentNullException>();
     }
 
     [Fact]
-    public void Ctor_Invalid_Throws()
+    public void Ctor_ValidOptions_Works()
     {
-        var options = new Http2ClientOptions { Timeout = TimeSpan.Zero };
+        var options = new Http2ClientOptions { LibraryPath = TestConstants.LibraryPath };
 
-        var action = () => new Http2Client(options);
+        using var client = new Http2Client(options);
 
-        action.Should().Throw<ArgumentException>();
+        client.Options.Should().BeSameAs(options);
+        client.SessionId.Should().Be(options.SessionId);
+        client.IsDisposed.Should().BeFalse();
     }
 
     [Fact]
-    public void Ctor_NoLib_Throws()
+    public void Dispose_Works()
     {
-        var options = new Http2ClientOptions { LibraryPath = "nonexistent.dll" };
+        var options = new Http2ClientOptions { LibraryPath = TestConstants.LibraryPath };
+        var client = new Http2Client(options);
 
-        var action = () => new Http2Client(options);
+        client.Dispose();
 
-        action.Should().Throw<FileNotFoundException>();
+        client.IsDisposed.Should().BeTrue();
     }
 
     [Fact]
-    public void SessionId_Works()
+    public void Send_NullRequest_Throws()
     {
-        var options = new Http2ClientOptions();
-        var expectedSessionId = options.SessionID;
+        var options = new Http2ClientOptions { LibraryPath = TestConstants.LibraryPath };
+        using var client = new Http2Client(options);
 
-        expectedSessionId.Should().NotBeEmpty();
-        options.SessionID.Should().Be(expectedSessionId);
-    }
-
-    [Fact]
-    public void Options_Works()
-    {
-        var options = new Http2ClientOptions();
-
-        options.BrowserType.Should().Be(BrowserType.Chrome131);
-        options.Timeout.Should().Be(TimeSpan.FromSeconds(60));
+        var action = () => client.Send(null!);
+        action.Should().Throw<ArgumentNullException>();
     }
 }

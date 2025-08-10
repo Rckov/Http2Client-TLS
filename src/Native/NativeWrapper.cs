@@ -14,7 +14,7 @@ internal class NativeWrapper : IDisposable
     private delegate IntPtr RequestDelegate(byte[] payload);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void FreeMemoryDelegate(string sessionID);
+    private delegate void FreeMemoryDelegate(string sessionId);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate IntPtr GetCookiesFromSessionDelegate(byte[] payload);
@@ -39,7 +39,7 @@ internal class NativeWrapper : IDisposable
     /// <summary>
     /// Creates wrapper from loaded library. Use Load() instead.
     /// </summary>
-    public NativeWrapper(nint libraryHandle)
+    private NativeWrapper(IntPtr libraryHandle)
     {
         _libraryHandle = libraryHandle;
 
@@ -55,11 +55,11 @@ internal class NativeWrapper : IDisposable
     /// <summary>
     /// Loads native library and creates wrapper. Cleans up on failure.
     /// </summary>
-    public static NativeWrapper Load(string path)
+    public static NativeWrapper Load(string? path)
     {
         ThrowException.FileNotExists(path);
 
-        var handleLib = NativeLoader.LoadLibrary(path!);
+        var handleLib = NativeLoader.LoadLibrary(path);
         try
         {
             return new NativeWrapper(handleLib);
@@ -77,7 +77,6 @@ internal class NativeWrapper : IDisposable
     /// </summary>
     public string Request(byte[] payload)
     {
-        ThrowException.Null(payload);
         return ExecuteFunction(() => _requestDelegate(payload));
     }
 
@@ -86,7 +85,6 @@ internal class NativeWrapper : IDisposable
     /// </summary>
     public string GetCookiesFromSession(byte[] payload)
     {
-        ThrowException.Null(payload);
         return ExecuteFunction(() => _getCookiesDelegate(payload));
     }
 
@@ -95,7 +93,6 @@ internal class NativeWrapper : IDisposable
     /// </summary>
     public string AddCookiesToSession(byte[] payload)
     {
-        ThrowException.Null(payload);
         return ExecuteFunction(() => _addCookiesDelegate(payload));
     }
 
@@ -104,7 +101,6 @@ internal class NativeWrapper : IDisposable
     /// </summary>
     public string DestroySession(byte[] payload)
     {
-        ThrowException.Null(payload);
         return ExecuteFunction(() => _destroySessionDelegate(payload));
     }
 
@@ -121,7 +117,6 @@ internal class NativeWrapper : IDisposable
     /// </summary>
     public void FreeMemory(string responseId)
     {
-        ThrowException.NullOrEmpty(responseId);
         _freeMemoryDelegate(responseId);
     }
 
@@ -143,7 +138,7 @@ internal class NativeWrapper : IDisposable
     /// <summary>
     /// Calls native function and converts result to string.
     /// </summary>
-    private static string ExecuteFunction(Func<nint> nativeFunction)
+    private static string ExecuteFunction(Func<IntPtr> nativeFunction)
     {
         var resultPtr = nativeFunction();
 

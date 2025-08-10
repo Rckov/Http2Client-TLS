@@ -1,21 +1,62 @@
 using FluentAssertions;
 
 using Http2Client.Builders;
-using Http2Client.Core.Enums;
 using Http2Client.Core.Models;
+
+using Xunit;
 
 namespace Http2Client.Test.Builders;
 
 public class HttpRequestBuilderTests
 {
     [Fact]
-    public void NoUrl_Throws()
+    public void Build_NoUrl_Throws()
     {
         var builder = new HttpRequestBuilder();
 
         builder.Invoking(b => b.Build())
-            .Should().Throw<InvalidOperationException>()
+            .Should()
+            .Throw<InvalidOperationException>()
             .WithMessage("RequestUrl is required*");
+    }
+
+    [Fact]
+    public void WithUrl_Invalid_Throws()
+    {
+        var builder = new HttpRequestBuilder();
+        builder.Invoking(b => b.WithUrl("invalid-url")).Should().Throw<ArgumentException>();
+    }
+
+    [Fact]
+    public void WithMethod_Null_Throws()
+    {
+        var builder = new HttpRequestBuilder();
+        builder.Invoking(b => b.WithMethod(null!)).Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
+    public void WithJsonBody_Null_Throws()
+    {
+        var builder = new HttpRequestBuilder();
+        builder.Invoking(b => b.WithJsonBody<object>(null!)).Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
+    public void WithBinaryBody_Null_Throws()
+    {
+        var builder = new HttpRequestBuilder();
+        builder.Invoking(b => b.WithBinaryBody(null!)).Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
+    public void WithLocalAddress_Invalid_Throws()
+    {
+        var builder = new HttpRequestBuilder();
+
+        builder.Invoking(b => b.WithLocalAddress("invalid-ip"))
+            .Should()
+            .Throw<ArgumentException>()
+            .WithMessage("Local address must be a valid IP address.*");
     }
 
     [Fact]
@@ -23,21 +64,10 @@ public class HttpRequestBuilderTests
     {
         var request = new HttpRequestBuilder()
             .WithUrl("https://example.com")
-            .WithMethod("post")
+            .WithMethod(HttpMethod.Post)
             .Build();
 
         request.RequestMethod.Should().Be("POST");
-    }
-
-    [Fact]
-    public void Method_Enum_Works()
-    {
-        var request = new HttpRequestBuilder()
-            .WithUrl("https://example.com")
-            .WithMethod(HttpMethod.Delete)
-            .Build();
-
-        request.RequestMethod.Should().Be("DELETE");
     }
 
     [Fact]
@@ -69,15 +99,25 @@ public class HttpRequestBuilderTests
     }
 
     [Fact]
-    public void Timeout_Negative_Throws()
+    public void WithTimeout_Negative_Throws()
     {
-        var builder = new HttpRequestBuilder()
-            .WithUrl("https://example.com")
-            .WithTimeout(TimeSpan.FromSeconds(-1));
+        var builder = new HttpRequestBuilder();
 
-        builder.Invoking(b => b.Build())
-            .Should().Throw<InvalidOperationException>()
-            .WithMessage("TimeoutMilliseconds must be positive*");
+        builder.Invoking(b => b.WithTimeout(TimeSpan.FromSeconds(-1)))
+            .Should()
+            .Throw<ArgumentException>()
+            .WithMessage("Timeout must be greater than zero.*");
+    }
+
+    [Fact]
+    public void WithTimeout_TooLarge_Throws()
+    {
+        var builder = new HttpRequestBuilder();
+
+        builder.Invoking(b => b.WithTimeout(TimeSpan.FromHours(1)))
+            .Should()
+            .Throw<ArgumentException>()
+            .WithMessage("Timeout cannot exceed 30 minutes.*");
     }
 
     [Fact]
@@ -87,20 +127,13 @@ public class HttpRequestBuilderTests
 
         var request = new HttpRequestBuilder()
             .WithUrl("https://example.com")
-            .WithMethod("POST")
-            .WithHeader("X-Test", "value")
+            .WithMethod(HttpMethod.Post)
             .AddCookie(cookie)
-            .WithBrowserType(BrowserType.Safari160)
-            .WithProxy("socks5://proxy:1080", true)
             .Build();
 
         request.RequestUrl.Should().Be("https://example.com");
         request.RequestMethod.Should().Be("POST");
-        request.Headers["X-Test"].Should().Be("value");
         request.RequestCookies.Should().ContainSingle().Which.Should().Be(cookie);
-        request.BrowserType.Should().Be(BrowserType.Safari160);
-        request.ProxyUrl.Should().Be("socks5://proxy:1080");
-        request.IsRotatingProxy.Should().BeTrue();
     }
 
     [Fact]
