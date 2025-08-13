@@ -32,13 +32,16 @@ Http2Client requires the native TLS library from the original [bogdanfinn/tls-cl
 **Installation Instructions:**
 
 1. Download the appropriate library file for your platform from the table above
-2. Place the native library in your application's output directory, or
-3. Specify the custom path using the `WithLibraryPath()` method in your code
+2. Place the native library in your application's output directory, or specify a custom path
+3. Initialize the library once at application startup using `Http2Client.Initialize()`
 
 **Example for Windows:**
 ```csharp
+// Initialize once at application startup
+Http2Client.Initialize("tls-client-windows-64-1.11.0.dll");
+
+// Create clients as needed
 using var client = new HttpClientBuilder()
-    .WithLibraryPath("tls-client-windows-64-1.11.0.dll")
     .Build();
 ```
 
@@ -56,9 +59,11 @@ using Http2Client.Builders;
 using Http2Client.Core.Enums;
 using Http2Client.Core.Request;
 
+// Initialize native library once at application startup
+Http2Client.Initialize("tls-client-windows-64-1.11.0.dll");
+
 // Create an Http2Client instance using the builder
 using var client = new HttpClientBuilder()
-    .WithLibraryPath("tls-client-windows-64-1.11.0.dll")
     .WithBrowserType(BrowserType.Chrome133)
     .WithUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
     .WithTimeout(TimeSpan.FromSeconds(30))
@@ -118,7 +123,6 @@ using var client = new HttpClientBuilder()
 
 | Method | Description |
 |--------|-------------|
-| `WithLibraryPath(string)` | Sets the path to the native TLS library. |
 | `WithBrowserType(BrowserType)` | Sets the browser fingerprint to mimic. |
 | `WithUserAgent(string)` | Sets the User-Agent header. |
 | `WithTimeout(TimeSpan)` | Sets the request timeout. |
@@ -142,8 +146,10 @@ using var client = new HttpClientBuilder()
 ### Advanced Example
 
 ```csharp
+// Initialize library once at startup
+Http2Client.Initialize("tls-client-windows-64-1.11.0.dll");
+
 using var client = new HttpClientBuilder()
-    .WithLibraryPath("tls-client-windows-64-1.11.0.dll")
     .WithBrowserType(BrowserType.Firefox132)
     .WithUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
     .WithProxy("http://127.0.0.1:8888", isRotating: true)
@@ -228,7 +234,6 @@ var request = new HttpRequest
 
 ```csharp
 using var client = new HttpClientBuilder()
-    .WithLibraryPath("tls-client-windows-64-1.11.0.dll")
     .WithBrowserType(BrowserType.Chrome133)
     .Build();
 
@@ -265,7 +270,6 @@ var response = client.Send(request);
 
 ```csharp
 using var client = new HttpClientBuilder()
-    .WithLibraryPath("tls-client-windows-64-1.11.0.dll")
     .WithBrowserType(BrowserType.Chrome133)
     .WithProxy("http://proxy.example.com:8080")
     .Build();
