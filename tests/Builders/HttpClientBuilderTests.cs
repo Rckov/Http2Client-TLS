@@ -52,7 +52,6 @@ public class HttpClientBuilderTests
     public void Chaining_Works()
     {
         var options = new HttpClientBuilder()
-            .WithLibraryPath(TestConstants.LibraryPath)
             .WithBrowserType(BrowserType.Firefox132)
             .WithTimeout(TimeSpan.FromSeconds(30))
             .WithProxy("http://proxy:8080", true)

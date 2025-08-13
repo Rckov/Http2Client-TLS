@@ -14,6 +14,11 @@ public class Http2ClientWebTests
 {
     private Http2Client? _client;
 
+    static Http2ClientWebTests()
+    {
+        Http2Client.Initialize(TestConstants.LibraryPath);
+    }
+
     [Fact]
     public void TlsPeet_Works()
     {
@@ -131,7 +136,6 @@ public class Http2ClientWebTests
     private Http2Client CreateClient()
     {
         return new HttpClientBuilder()
-            .WithLibraryPath(TestConstants.LibraryPath)
             .WithBrowserType(BrowserType.Chrome133)
             .WithUserAgent("Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
             .WithCookies()

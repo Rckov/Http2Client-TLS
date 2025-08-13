@@ -8,6 +8,11 @@ namespace Http2Client.Test;
 
 public class Http2ClientOptionsTests
 {
+    static Http2ClientOptionsTests()
+    {
+        Http2Client.Initialize(TestConstants.LibraryPath);
+    }
+
     [Fact]
     public void SetsDefaults()
     {
@@ -51,7 +56,6 @@ public class Http2ClientOptionsTests
     {
         var options = new Http2ClientOptions
         {
-            LibraryPath = TestConstants.LibraryPath,
             WithDefaultCookieJar = true,
             WithoutCookieJar = true
         };
@@ -67,7 +71,6 @@ public class Http2ClientOptionsTests
     {
         var options = new Http2ClientOptions
         {
-            LibraryPath = TestConstants.LibraryPath,
             DisableIPv4 = true,
             DisableIPv6 = true
         };
@@ -83,7 +86,6 @@ public class Http2ClientOptionsTests
     {
         var options = new Http2ClientOptions
         {
-            LibraryPath = TestConstants.LibraryPath,
             Timeout = TimeSpan.Zero
         };
 
@@ -95,18 +97,10 @@ public class Http2ClientOptionsTests
     {
         var options = new Http2ClientOptions
         {
-            LibraryPath = TestConstants.LibraryPath,
             ProxyUrl = "invalid-url"
         };
 
         options.Invoking(o => o.Validate()).Should().Throw<ArgumentException>();
-    }
-
-    [Fact]
-    public void Validate_LibraryPath_Throws()
-    {
-        var options = new Http2ClientOptions { LibraryPath = "nonexistent.dll" };
-        options.Invoking(o => o.Validate()).Should().Throw<FileNotFoundException>();
     }
 
     [Fact]

@@ -6,6 +6,11 @@ namespace Http2Client.Test;
 
 public class Http2ClientTests
 {
+    static Http2ClientTests()
+    {
+        Http2Client.Initialize(TestConstants.LibraryPath);
+    }
+
     [Fact]
     public void Ctor_Null_Throws()
     {
@@ -16,7 +21,7 @@ public class Http2ClientTests
     [Fact]
     public void Ctor_ValidOptions_Works()
     {
-        var options = new Http2ClientOptions { LibraryPath = TestConstants.LibraryPath };
+        var options = new Http2ClientOptions();
 
         using var client = new Http2Client(options);
 
@@ -28,8 +33,7 @@ public class Http2ClientTests
     [Fact]
     public void Dispose_Works()
     {
-        var options = new Http2ClientOptions { LibraryPath = TestConstants.LibraryPath };
-        var client = new Http2Client(options);
+        var client = new Http2Client();
 
         client.Dispose();
 
@@ -39,8 +43,7 @@ public class Http2ClientTests
     [Fact]
     public void Send_NullRequest_Throws()
     {
-        var options = new Http2ClientOptions { LibraryPath = TestConstants.LibraryPath };
-        using var client = new Http2Client(options);
+        using var client = new Http2Client();
 
         var action = () => client.Send(null!);
         action.Should().Throw<ArgumentNullException>();
