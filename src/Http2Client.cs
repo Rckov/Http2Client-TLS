@@ -35,7 +35,7 @@ public sealed class Http2Client : IDisposable
     /// <summary>
     /// True if native library is loaded and ready to use.
     /// </summary>
-    public static bool IsLibraryLoaded => NativeWrapper.IsInitialized;
+    public static bool IsInitialized => NativeWrapper.IsInitialized;
 
     /// <summary>
     /// Create client with custom options.
