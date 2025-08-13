@@ -8,15 +8,22 @@ using System.Text.Json;
 
 internal class Program
 {
-    private const string PATH_LIB = "Native\\tls-client-windows-64-1.11.0.dll";
-
     private static void Main()
     {
-        //BasicGetRequest();
-        //PostJsonRequest();
-        //CookieHandling();
-        //HeadersAndProxy();
-        ErrorHandlingAndTimeouts();
+        Http2Client.Http2Client.Initialize("Native\\tls-client-windows-64-1.11.0.dll");
+
+        try
+        {
+            BasicGetRequest();
+            PostJsonRequest();
+            CookieHandling();
+            HeadersAndProxy();
+            ErrorHandlingAndTimeouts();
+        }
+        finally
+        {
+            Http2Client.Http2Client.Cleanup();
+        }
 
         Console.ReadLine();
     }
@@ -27,7 +34,6 @@ internal class Program
 
         using var client = new HttpClientBuilder()
             .WithUserAgent("Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
-            .WithLibraryPath(PATH_LIB)
             .WithRandomTlsExtensions()
             .Build();
 
@@ -50,7 +56,6 @@ internal class Program
 
         using var client = new HttpClientBuilder()
             .WithUserAgent("Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36")
-            .WithLibraryPath(PATH_LIB)
             .WithHeader("Content-Type", "application/json")
             .WithCookies()
             .Build();
@@ -83,7 +88,6 @@ internal class Program
 
         using var client = new HttpClientBuilder()
             .WithUserAgent("Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36")
-            .WithLibraryPath(PATH_LIB)
             .WithCookies(true)
             .Build();
 
@@ -118,7 +122,6 @@ internal class Program
 
         using var client = new HttpClientBuilder()
             .WithUserAgent("Custom-Agent/1.0")
-            .WithLibraryPath(PATH_LIB)
             .WithHeader("Accept", "application/json")
             .WithHeader("Accept-Language", "en-US,en;q=0.9")
             .WithHeader("Accept-Encoding", "gzip, deflate, br")
@@ -150,7 +153,6 @@ internal class Program
 
         using var client = new HttpClientBuilder()
             .WithUserAgent("Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36")
-            .WithLibraryPath(PATH_LIB)
             .WithTimeout(TimeSpan.FromSeconds(10))
             .WithCatchPanics(true)
             .WithInsecureSkipVerify(false)

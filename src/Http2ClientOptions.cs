@@ -104,11 +104,6 @@ public class Http2ClientOptions
     public bool WithRandomTlsExtensionOrder { get; set; }
 
     /// <summary>
-    /// Path to native TLS library. Auto-detected if not specified.
-    /// </summary>
-    public string? LibraryPath { get; set; } = GetDefaultLibraryPath();
-
-    /// <summary>
     /// User-Agent header value.
     /// </summary>
     public string? UserAgent
@@ -132,8 +127,6 @@ public class Http2ClientOptions
     /// </summary>
     public void Validate()
     {
-        ThrowException.FileNotExists(LibraryPath, nameof(LibraryPath));
-
         if (!string.IsNullOrEmpty(ProxyUrl))
         {
             ThrowException.IsUri(ProxyUrl, nameof(ProxyUrl));
@@ -178,7 +171,6 @@ public class Http2ClientOptions
             WithDefaultCookieJar = WithDefaultCookieJar,
             WithoutCookieJar = WithoutCookieJar,
             WithRandomTlsExtensionOrder = WithRandomTlsExtensionOrder,
-            LibraryPath = LibraryPath
         };
 
         // Deep copy headers so changes to the clone don't mess with the original
@@ -188,15 +180,5 @@ public class Http2ClientOptions
         }
 
         return clone;
-    }
-
-    /// <summary>
-    /// Gets default native library path for current platform.
-    /// </summary>
-    private static string GetDefaultLibraryPath()
-    {
-        // .dll / .so / .dylib
-        var extension = PlatformSupport.GetNativeLibraryExtension();
-        return PlatformSupport.GetRuntimePath($"tls-client.{extension}");
     }
 }
