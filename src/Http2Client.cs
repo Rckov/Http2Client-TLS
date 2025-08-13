@@ -15,7 +15,6 @@ namespace Http2Client;
 public sealed class Http2Client : IDisposable
 {
     private readonly Http2ClientOptions _options;
-    private readonly NativeWrapper _wrapper;
     private bool _disposed;
 
     /// <summary>
@@ -34,6 +33,11 @@ public sealed class Http2Client : IDisposable
     public bool IsDisposed => _disposed;
 
     /// <summary>
+    /// True if native library is loaded and ready to use.
+    /// </summary>
+    public static bool IsLibraryLoaded => NativeWrapper.IsInitialized;
+
+    /// <summary>
     /// Create client with custom options.
     /// </summary>
     /// <param name="options">Client configuration</param>
@@ -41,7 +45,6 @@ public sealed class Http2Client : IDisposable
     {
         _options = options ?? throw new ArgumentNullException(nameof(options));
         _options.Validate();
-        _wrapper = NativeWrapper.Load(_options.LibraryPath);
     }
 
     /// <summary>
@@ -49,6 +52,23 @@ public sealed class Http2Client : IDisposable
     /// </summary>
     public Http2Client() : this(new Http2ClientOptions())
     {
+    }
+
+    /// <summary>
+    /// Initialize native library once. Call this before creating any Http2Client instances.
+    /// </summary>
+    /// <param name="path">Path to native TLS library</param>
+    public static void Initialize(string path)
+    {
+        NativeWrapper.Initialize(path);
+    }
+
+    /// <summary>
+    /// Cleanup native library resources. Call at application shutdown.
+    /// </summary>
+    public static void Cleanup()
+    {
+        NativeWrapper.Cleanup();
     }
 
     /// <summary>
@@ -67,7 +87,7 @@ public sealed class Http2Client : IDisposable
 
         try
         {
-            var responseJson = _wrapper.Request(Serializer.SerializeToBytes(prepared));
+            var responseJson = NativeWrapper.Request(Serializer.SerializeToBytes(prepared));
             response = Serializer.Deserialize<HttpResponse>(responseJson);
             return response;
         }
@@ -80,7 +100,7 @@ public sealed class Http2Client : IDisposable
             // Clean up native memory for this response
             if (response != null && !string.IsNullOrEmpty(response.Id))
             {
-                _wrapper.FreeMemory(response.Id);
+                NativeWrapper.FreeMemory(response.Id);
             }
         }
     }
@@ -100,7 +120,7 @@ public sealed class Http2Client : IDisposable
             SessionId = _options.SessionId,
         };
 
-        var responseJson = _wrapper.GetCookiesFromSession(Serializer.SerializeToBytes(payload));
+        var responseJson = NativeWrapper.GetCookiesFromSession(Serializer.SerializeToBytes(payload));
         return Serializer.Deserialize<CookiesResponse>(responseJson);
     }
 
@@ -122,7 +142,7 @@ public sealed class Http2Client : IDisposable
             Cookies = [.. cookies]
         };
 
-        var responseJson = _wrapper.AddCookiesToSession(Serializer.SerializeToBytes(payload));
+        var responseJson = NativeWrapper.AddCookiesToSession(Serializer.SerializeToBytes(payload));
         return Serializer.Deserialize<CookiesResponse>(responseJson);
     }
 
@@ -135,7 +155,7 @@ public sealed class Http2Client : IDisposable
         try
         {
             var payload = new { sessionId = _options.SessionId };
-            var responseJson = _wrapper.DestroySession(Serializer.SerializeToBytes(payload));
+            var responseJson = NativeWrapper.DestroySession(Serializer.SerializeToBytes(payload));
             return !string.IsNullOrEmpty(responseJson);
         }
         catch
@@ -153,7 +173,7 @@ public sealed class Http2Client : IDisposable
     {
         try
         {
-            var responseJson = _wrapper.DestroyAllSessions();
+            var responseJson = NativeWrapper.DestroyAllSessions();
             return !string.IsNullOrEmpty(responseJson);
         }
         catch
@@ -286,11 +306,9 @@ public sealed class Http2Client : IDisposable
             }
             catch
             {
-                // If session cleanup fails, we still want to dispose the wrapper
+                // If session cleanup fails, we still want to continue disposal
                 // Better to leak a session than crash during disposal
             }
-
-            _wrapper?.Dispose();
         }
 
         _disposed = true;

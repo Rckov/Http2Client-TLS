@@ -196,17 +196,6 @@ public class HttpClientBuilder
     }
 
     /// <summary>
-    /// Sets native library path. Auto-detected if not set.
-    /// </summary>
-    public HttpClientBuilder WithLibraryPath(string libraryPath)
-    {
-        ThrowException.FileNotExists(libraryPath, nameof(libraryPath));
-
-        _options.LibraryPath = libraryPath;
-        return this;
-    }
-
-    /// <summary>
     /// Sets User-Agent header.
     /// </summary>
     public HttpClientBuilder WithUserAgent(string userAgent)
